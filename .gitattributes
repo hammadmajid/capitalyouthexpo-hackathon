@@ -1,0 +1,9 @@
+*.sh text eol=lf
+
+*.patch text eol=lf
+packages/db/migrations/0040_stabilize_inventory_history.sql text eol=lf
+packages/db/migrations/0041_phase3_chat.sql text eol=lf
+packages/db/migrations/0042_phase3_chat_history.sql text eol=lf
+packages/db/migrations/0043_phase3_chat_reports.sql text eol=lf
+packages/db/migrations/0044_phase3_report_integrity.sql text eol=lf
+packages/db/migrations/0045_phase3_authority_events.sql text eol=lf

@@ -1,0 +1,56 @@
+# Dependencies & build output
+node_modules/
+.tools/
+dist/
+build/
+.next/
+.expo/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+!.env.worker.example
+*.pem
+*.key
+
+# OS / editor junk
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Only pnpm lockfile allowed
+package-lock.json
+yarn.lock
+.generated/
+
+test-results/
+playwright-report/
+
+# Next.js regenerates this framework type entry point.
+apps/web/next-env.d.ts
+
+# Expo Continuous Native Generation output
+apps/mobile/android/
+apps/mobile/ios/
+.native-diagnostics/
+
+# Revision-bound coverage producer artifacts
+coverage-evidence/
+
+# Generated MapLibre worker copy (scripts/maplibre-worker.mjs)
+apps/web/public/vendor/
+
+# Local pnpm content-addressable store
+.pnpm-store/
