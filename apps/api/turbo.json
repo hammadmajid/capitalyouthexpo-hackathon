@@ -1,0 +1,4 @@
+{
+  "extends": ["//"],
+  "tasks": { "test:integration": { "dependsOn": ["build", "@hsm/worker#build"] } }
+}
