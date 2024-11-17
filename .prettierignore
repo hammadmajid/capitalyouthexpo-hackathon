@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+node_modules
+.turbo
+dist
+coverage
+.next
+.expo
+docs/srs/SRS-v2.0-text.txt
+
+.tools/
+.generated/
+
+# Next.js regenerates this framework type entry point.
+apps/web/next-env.d.ts
