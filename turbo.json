@@ -1,0 +1,251 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["packages/config/*.json", "packages/config/*.mjs", ".env.example"],
+  "tasks": {
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["DATABASE_URL", "ROOT_ADMIN_EMAIL", "ROOT_ADMIN_PASSWORD"]
+    },
+    "test:integration": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": ["coverage/**", "test-results/**"],
+      "env": [
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_RYUK_DISABLED",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE",
+        "TESTCONTAINERS_RYUK_PRIVILEGED"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/eslint.config.mjs"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "^build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["coverage/**"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "interactive": false,
+      "env": ["PORT", "HOSTNAME", "API_PORT", "API_HOST", "NODE_ENV"]
+    },
+    "api:generate": {
+      "dependsOn": ["build"],
+      "outputs": [".generated/openapi.json"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/**/*.spec.ts", "!test/**"]
+    },
+    "client:generate": {
+      "dependsOn": ["@hsm/api#api:generate"],
+      "outputs": ["src/generated/**"],
+      "inputs": [
+        "scripts/**",
+        "package.json",
+        "$TURBO_ROOT$/package.json",
+        "$TURBO_ROOT$/prettier.config.mjs"
+      ]
+    },
+    "@hsm/api#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/**/*.spec.ts", "!test/**"],
+      "outputs": ["dist/**"]
+    },
+    "@hsm/api#typecheck": {
+      "dependsOn": ["build", "^typecheck"],
+      "outputs": []
+    },
+    "@hsm/api-client#build": {
+      "dependsOn": ["^build", "client:generate"],
+      "outputs": ["dist/**"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/**/*.spec.ts"]
+    },
+    "@hsm/api-client#typecheck": {
+      "dependsOn": ["^typecheck", "client:generate"],
+      "outputs": []
+    },
+    "test:e2e": {
+      "outputs": ["test-results/**"],
+      "cache": false,
+      "env": [
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE",
+        "TESTCONTAINERS_RYUK_PRIVILEGED"
+      ],
+      "dependsOn": ["build", "@hsm/api#build", "@hsm/worker#build"]
+    },
+    "@hsm/web#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["APP_ENV", "API_ORIGIN", "WEB_ORIGIN", "WEB_UPLOAD_ORIGIN", "NEXT_PUBLIC_SENTRY_DSN"]
+    },
+    "@hsm/web#typecheck": {
+      "outputs": [],
+      "dependsOn": ["^build", "^typecheck"]
+    },
+    "start": {
+      "env": ["APP_ENV", "API_ORIGIN", "WEB_ORIGIN", "WEB_UPLOAD_ORIGIN", "PORT", "HOSTNAME"],
+      "persistent": true,
+      "cache": false
+    },
+    "@hsm/web#dev": {
+      "env": ["APP_ENV", "API_ORIGIN", "WEB_ORIGIN", "WEB_UPLOAD_ORIGIN", "PORT"],
+      "persistent": true,
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "test:components": {
+      "outputs": [],
+      "dependsOn": ["^build"]
+    },
+    "android:prepare": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "env": ["EXPO_PUBLIC_API_URL", "EXPO_PUBLIC_APP_ENV", "EXPO_PUBLIC_SENTRY_DSN"]
+    },
+    "android:debug": {
+      "cache": false,
+      "dependsOn": ["android:prepare"],
+      "outputs": ["android/app/build/outputs/apk/debug/**"],
+      "env": ["JAVA_HOME", "ANDROID_HOME", "ANDROID_SDK_ROOT", "GRADLE_USER_HOME", "PATH"]
+    },
+    "@hsm/mobile#build": {
+      "env": ["EXPO_PUBLIC_API_URL", "EXPO_PUBLIC_APP_ENV", "EXPO_PUBLIC_SENTRY_DSN"],
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"]
+    },
+    "@hsm/mobile#dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"],
+      "env": ["EXPO_PUBLIC_API_URL", "EXPO_PUBLIC_APP_ENV", "EXPO_PUBLIC_SENTRY_DSN"]
+    },
+    "test:native": {
+      "outputs": ["test-results/**"],
+      "cache": false,
+      "dependsOn": ["build", "@hsm/api#build", "@hsm/worker#build"],
+      "passThroughEnv": ["PATH", "MAESTRO_CLI_NO_ANALYTICS"],
+      "env": [
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "EXPO_PUBLIC_APP_ENV",
+        "EXPO_PUBLIC_API_URL",
+        "ANDROID_HOME",
+        "ANDROID_SDK_ROOT",
+        "JAVA_HOME"
+      ]
+    },
+    "security:audit": {
+      "dependsOn": ["test"],
+      "cache": false,
+      "passThroughEnv": ["npm_execpath", "PATH"],
+      "outputs": ["test-results/**"]
+    },
+    "test:containers": {
+      "dependsOn": ["@hsm/test-support#build"],
+      "cache": false,
+      "outputs": ["test-results/application-containers.xml"],
+      "env": [
+        "HSM_CI_IMAGE",
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE",
+        "TESTCONTAINERS_RYUK_PRIVILEGED"
+      ]
+    },
+    "coverage:unit": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["coverage/aggregate/**"]
+    },
+    "coverage:components": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["coverage/aggregate-components/**"]
+    },
+    "coverage:integration": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": ["coverage/aggregate-infrastructure/**", "test-results/**"],
+      "env": [
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_RYUK_DISABLED",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE",
+        "TESTCONTAINERS_RYUK_PRIVILEGED"
+      ]
+    },
+    "coverage:produce": {
+      "cache": false,
+      "outputs": ["coverage-evidence/**"],
+      "passThroughEnv": ["PATH", "npm_execpath"],
+      "env": [
+        "DOCKER_HOST",
+        "DOCKER_TLS_VERIFY",
+        "DOCKER_CERT_PATH",
+        "TESTCONTAINERS_RYUK_DISABLED",
+        "TESTCONTAINERS_HOST_OVERRIDE",
+        "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE",
+        "TESTCONTAINERS_RYUK_PRIVILEGED"
+      ]
+    },
+    "coverage:aggregate": {
+      "cache": false,
+      "outputs": ["coverage-evidence/aggregate.json"]
+    },
+    "@hsm/contracts#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/**/*.spec.ts"]
+    },
+    "@hsm/notifications#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/**/*.spec.ts", "!test/**"]
+    },
+    "@hsm/db#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "inputs": ["$TURBO_DEFAULT$", "!test/**", "!unit/**"]
+    },
+    "test:visits": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    }
+  }
+}
