@@ -1,0 +1,262 @@
+name: Foundation checks
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run lint typecheck test test:components build
+      - name: Validate generated API client drift
+        run: |
+          pnpm turbo run api:generate client:generate --force
+          git diff --exit-code -- packages/api-client/src/generated
+      - name: Validate generated migration drift
+        run: |
+          pnpm turbo run db:generate
+          test -z "$(git status --porcelain -- packages/db/migrations)"
+      - run: pnpm exec prettier --check package.json turbo.json pnpm-workspace.yaml packages apps infra .github
+      - name: Security audit with verified expiring backports
+        run: pnpm turbo run security:audit --filter=@hsm/config
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: security-audit
+          path: packages/config/test-results
+          if-no-files-found: error
+      - name: Produce whole-application unit and component coverage
+        run: pnpm turbo run coverage:produce --filter=@hsm/config -- quality
+      - uses: actions/upload-artifact@v7
+        with:
+          name: aggregate-quality-evidence
+          path: packages/config/coverage-evidence/quality
+          if-no-files-found: error
+      - name: Reject alternative lockfiles
+        run: test ! -f package-lock.json && test ! -f yarn.lock
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: unit-coverage
+          path: |
+            packages/*/coverage
+            apps/*/coverage
+          if-no-files-found: error
+  container-integration:
+    name: Real infrastructure integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Require working container runtime and Compose
+        run: |
+          docker info
+          docker compose version
+      - name: Real migrations, seed, constraints, transactions and infrastructure
+        run: pnpm turbo run coverage:produce --filter=@hsm/config -- infrastructure
+      - uses: actions/upload-artifact@v7
+        with:
+          name: aggregate-infrastructure-evidence
+          path: packages/config/coverage-evidence/infrastructure
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: integration-results
+          path: |
+            packages/*/coverage
+            packages/*/test-results
+            apps/*/coverage
+            apps/*/test-results
+          if-no-files-found: error
+  aggregate-coverage:
+    name: Exact-revision whole-application coverage
+    needs: [quality, container-integration]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with:
+          name: aggregate-quality-evidence
+          path: packages/config/coverage-evidence/quality
+      - uses: actions/download-artifact@v8
+        with:
+          name: aggregate-infrastructure-evidence
+          path: packages/config/coverage-evidence/infrastructure
+      - name: Require exact source, whole-app 80 percent and Phase 2 business 90 percent
+        run: pnpm turbo run coverage:aggregate --filter=@hsm/config
+      - uses: actions/upload-artifact@v7
+        with:
+          name: aggregate-coverage
+          path: packages/config/coverage-evidence/aggregate.json
+          if-no-files-found: error
+  application-containers:
+    name: Real API worker and web containers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Require compatible Linux container runtime
+        run: docker info
+      - name: Build actual API worker and production web image
+        run: docker build -f infra/containers/ci.Dockerfile -t hsm-phase1-ci:${{ github.sha }} .
+      - name: Verify container processes and real HTTP worker storage and CSRF behavior
+        run: pnpm turbo run test:containers --filter=@hsm/api --concurrency=1
+        env:
+          HSM_CI_IMAGE: hsm-phase1-ci:${{ github.sha }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: application-container-results
+          path: apps/api/test-results/application-containers.xml
+          if-no-files-found: error
+  browser-integration:
+    name: Real browser and API integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Require real container runtime
+        run: docker info
+      - name: Install Chromium and system dependencies
+        run: pnpm --filter @hsm/web exec playwright install --with-deps chromium
+      - name: Production browser, API, worker and real infrastructure
+        run: pnpm turbo run test:e2e --filter=@hsm/web --concurrency=1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-results
+          path: apps/web/test-results/browser.xml
+          if-no-files-found: error
+  native-integration:
+    name: Real Android and API integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      EXPO_PUBLIC_APP_ENV: test
+      EXPO_PUBLIC_API_URL: http://localhost:4000
+      MAESTRO_CLI_NO_ANALYTICS: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - name: Reserve disk space for Android build and emulator
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: 'false'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: docker info
+      - name: Compile shared modules and export native production bundle
+        run: pnpm turbo run build --filter=@hsm/mobile --concurrency=1
+      - name: Generate Android project without installing alternative lockfiles
+        run: pnpm turbo run android:prepare --filter=@hsm/mobile --concurrency=1
+      - name: Build bundled Android test APK
+        working-directory: apps/mobile/android
+        run: ./gradlew :app:assembleRelease -PreactNativeArchitectures=x86_64,arm64-v8a --build-cache --no-daemon
+      - name: Verify emulator and Pixel native libraries and APK signature
+        working-directory: apps/mobile/android
+        run: |
+          unzip -l app/build/outputs/apk/release/app-release.apk | grep 'lib/arm64-v8a/libhermesvm.so'
+          unzip -l app/build/outputs/apk/release/app-release.apk | grep 'lib/x86_64/libhermesvm.so'
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify app/build/outputs/apk/release/app-release.apk
+      - name: Require the installed map picker to request no location permission
+        working-directory: apps/mobile/android
+        run: |
+          permissions=$("$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest permissions app/build/outputs/apk/release/app-release.apk)
+          if printf '%s' "$permissions" | grep -Eq 'android.permission.ACCESS_(COARSE|FINE|BACKGROUND)_LOCATION'; then
+            echo 'Unexpected Android location permission'
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: hsm-android-test-apk
+          path: apps/mobile/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+      - name: Install pinned Maestro CLI
+        run: |
+          curl --fail --location https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.11.0/maestro.zip --output "$RUNNER_TEMP/maestro.zip"
+          echo "5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a  $RUNNER_TEMP/maestro.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/maestro.zip" -d "$RUNNER_TEMP/maestro-cli"
+          echo "$RUNNER_TEMP/maestro-cli/maestro/bin" >> "$GITHUB_PATH"
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Installed Android app against actual API worker and containers
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: pnpm turbo run test:native --filter=@hsm/mobile --concurrency=1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-results
+          path: apps/mobile/test-results/native.xml
+          if-no-files-found: error
+  secrets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: '8.30.1'
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Semgrep TypeScript checks
+        run: docker run --rm -v "$PWD:/src" semgrep/semgrep:1.140.0 semgrep scan --config p/typescript --error
