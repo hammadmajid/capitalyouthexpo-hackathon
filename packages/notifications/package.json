@@ -1,0 +1,28 @@
+{
+  "name": "@hsm/notifications",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "lint": "eslint src test *.ts",
+    "test": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts",
+    "coverage:integration": "vitest run --config vitest.aggregate.integration.config.ts"
+  },
+  "dependencies": {
+    "@hsm/db": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*",
+    "testcontainers": "catalog:"
+  }
+}
