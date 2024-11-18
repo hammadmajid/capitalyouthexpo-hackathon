@@ -1,0 +1,32 @@
+{
+  "name": "@hsm/files",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "lint": "eslint src test *.ts",
+    "test": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts",
+    "coverage:integration": "vitest run --config vitest.aggregate.integration.config.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/s3-request-presigner": "3.1173.0",
+    "@hsm/contracts": "workspace:*",
+    "@hsm/db": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "file-type": "22.3.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*",
+    "testcontainers": "catalog:"
+  }
+}
