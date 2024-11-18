@@ -1,0 +1,21 @@
+{
+  "name": "@hsm/security",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/envelope.js",
+    "./envelope": "./dist/envelope.js"
+  },
+  "types": "./dist/envelope.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "lint": "eslint src *.ts",
+    "test": "vitest run --coverage",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*"
+  }
+}
