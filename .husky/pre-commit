@@ -1,0 +1,6 @@
+pnpm exec lint-staged --concurrent 1
+scanner=gitleaks
+if ! command -v "$scanner" >/dev/null 2>&1; then
+  scanner=./.tools/bin/gitleaks.exe
+fi
+"$scanner" git --pre-commit --staged --redact
