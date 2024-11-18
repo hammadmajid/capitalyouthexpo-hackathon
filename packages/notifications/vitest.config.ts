@@ -1,0 +1,14 @@
+import { defineConfig } from 'vitest/config';
+export default defineConfig({
+  test: {
+    include: ['src/**/*.spec.ts'],
+    maxWorkers: 1,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.spec.ts'],
+      thresholds: { lines: 90, statements: 90, functions: 90, branches: 85 },
+      reporter: ['text', 'lcov', 'json-summary'],
+    },
+  },
+});
