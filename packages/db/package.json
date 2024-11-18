@@ -1,0 +1,40 @@
+{
+  "name": "@hsm/db",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./schema": "./dist/schema/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "lint": "eslint src test unit drizzle.config.ts",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "test:integration": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node dist/migrate.js",
+    "db:seed": "node dist/seed-cli.js",
+    "db:seed:geography": "node dist/seed-geography-cli.js",
+    "test": "vitest run --config vitest.unit.config.ts",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts",
+    "coverage:integration": "vitest run --config vitest.aggregate.integration.config.ts",
+    "test:visits": "vitest run --config vitest.unit.config.ts unit/visit-follow-up.spec.ts unit/migration-history.spec.ts unit/migrations.spec.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "catalog:",
+    "postgres": "catalog:",
+    "dotenv": "catalog:",
+    "uuid": "catalog:",
+    "argon2": "catalog:",
+    "zod": "catalog:",
+    "@hsm/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*",
+    "drizzle-kit": "catalog:",
+    "testcontainers": "catalog:",
+    "@aws-sdk/client-s3": "catalog:"
+  }
+}
