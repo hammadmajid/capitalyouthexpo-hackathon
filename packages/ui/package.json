@@ -1,0 +1,22 @@
+{
+  "name": "@hsm/ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./tokens.css": "./dist/tokens.css"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "lint": "eslint src scripts",
+    "test": "vitest run --coverage",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
