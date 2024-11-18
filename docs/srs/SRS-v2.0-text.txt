@@ -1,0 +1,1847 @@
+=== PAGE 1 ===
+MASTER SOFTWARE REQUIREMENTS SPECIFICATION
+Twin Cities Hostel
+Marketplace &
+Management System
+A verified hostel marketplace connected to branch-scoped hostel
+operations, bed booking, resident management, monthly rent
+tracking, complaints and platform administration.
+Marketplace Hostel Management Resident Portal Platform Admin 50-page detailed specification
+Version
+2.0 - Consolidated MVP
+Target Market
+Islamabad & Rawalpindi, Pakistan
+Commercial Model
+3-month free trial; PKR 5,000 main
+branch; PKR 3,500 additional branch
+Confidential product specification Page 1 of 50
+=== PAGE 2 ===
+SOFTWARE REQUIREMENTS SPECIFICATION
+Document Control &
+Baseline
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Document purpose
+This document is the development baseline for the MVP. It
+consolidates product, marketplace, branch-management,
+rent, resident, verification, security, platform administration
+and acceptance requirements.
+Source-of-truth rule
+Where older product notes conflict with this version, SRS
+v2.0 controls. Future changes must be versioned through
+explicit change control rather than silently altering
+implemented business logic.
+Document Control
+Field Value
+Document Twin Cities Hostel Marketplace & Management System - Master SRS
+Version 2.0
+Status Implementation-ready MVP baseline
+Date 5 October 2026
+Geography Islamabad and Rawalpindi
+Primary users Customers, residents, hostel owners, branch managers, platform administrators
+Primary commercial model Customers free; management subscription by branch
+Primary branch price PKR 5,000/month after branch trial
+Additional branch price PKR 3,500/month after branch trial
+Trial 3 months per newly approved branch
+Payment custody Platform does not hold hostel rent or deposits
+Excluded product category No general inventory-management system
+Implementation principle. Data integrity, access isolation, rent/payment auditability and
+bed-booking correctness take priority over visual polish or feature count.
+Detailed implementation rules
+Change control. Any change that affects pricing, authorization,
+booking state, rent state, data retention or public disclosure must
+receive a new SRS version and migration note.
+Terminology. “Seat” and “bed” are operational synonyms in the
+product; the database may use one canonical term while UI labels
+remain configurable.
+Configuration. Values described as manager-configurable must have
+sensible defaults and server-side validation rather than accepting
+arbitrary unsafe input.
+Traceability. Requirement IDs in this document should be referenced
+by API stories, QA cases and implementation tickets.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 2 of 50
+=== PAGE 3 ===
+NAVIGATION
+Table of
+Contents
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+The 50-page structure is organized around buildable modules rather than a long feature list. Page numbers
+below are stable for this release.
+1. Document Control & Executive Context 2
+2. Product Vision, Scope & Boundaries 4
+3. Users, Roles & Access Model 6
+4. Customer Identity & Authentication 8
+5. Owner & Manager Onboarding 9
+6. Geography, Search & Marketplace Discovery 12
+7. Marketplace Listing & Trust Model 14
+8. Hostel / Branch Setup & Verification 16
+9. Rooms, Seats, Pricing & Photos 18
+10. Bed Board & Occupancy 20
+11. Booking, Visit, Chat & Waiting List 21
+12. Resident Lifecycle & Active Hostel 24
+13. Rent, Payment Proof & Rent Board 26
+14. Deposits, Late Payment & Receipts 30
+15. Mess, Transport & Complaints 32
+16. Checkout & Reviews 34
+17. Owner / Manager Dashboards 36
+18. Reports, Subscription & Platform Admin 39
+19. Security, Privacy & Auditability 44
+20. Data Model & Business Rules 46
+21. End-to-End Workflows & Permissions 48
+22. Acceptance Criteria & MVP Exit 50
+Reading order. Product/design teams should start with pages 4-15; engineering should
+focus on pages 16-49; QA should use pages 47-50 as the acceptance baseline.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 3 of 50
+=== PAGE 4 ===
+PRODUCT VISION
+Executive Product
+Definition
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+PRODUCT DEFINITION
+Marketplace + Hostel Operations, Not
+Generic Property Software
+The platform has two equal product pillars: a customer marketplace for verified hostel discovery
+and a focused management system for beds, bookings, residents, rent and complaints.
+Core customer promise
+Verified hostel. Real available seat.
+Real price.
+Customers must be able to see where the
+hostel is, what each room/seat costs,
+which seat is available, what the room
+looks like, the security deposit, amenities,
+menu, ratings and nearby universities
+before deciding.
+Core owner promise
+Owners manage every owned hostel/branch, see who occupies
+each seat, accept bookings, track monthly rent, verify proof,
+handle complaints and analyze branch performance from one
+account.
+Focused MVP operations
+Rooms and seat/bed availability
+Booking requests and reservation control
+Residents and active-stay records
+Monthly rent and payment-proof verification
+Security deposits
+Complaints
+Mess/menu and optional transport
+Reports and platform verification
+Explicitly not an inventory system. The
+MVP does not manage general stock, food
+inventory, furniture stock control or
+warehouse-style inventory.
+Detailed implementation rules
+Primary success measure. The marketplace is successful only when
+customers can reliably find genuine available accommodation and
+owners keep branch occupancy and rent data current.
+No false availability. Availability displayed to customers must
+originate from branch operations, not a separately editable marketing
+counter.
+Owner utility. If owners cannot complete routine booking, check-in
+and rent tasks faster than manual registers/WhatsApp, the product has
+failed its operational objective.
+Marketplace trust. Verification, transparent pricing, photos and
+verified-stay reviews are core product functions rather than optional
+marketing features.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 4 of 50
+=== PAGE 5 ===
+SCOPE
+MVP Scope & Explicit
+Boundaries
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+MVP - Included
+Islamabad + Rawalpindi marketplace
+Owner multi-brand / multi-branch structure
+Manager one-branch scope
+Room and seat pricing
+Mandatory room + available-seat photos
+Bed Board and Rent Board
+Booking, visit, chat, waiting list
+Active Hostel resident portal
+Direct-to-hostel rent payments with proof upload
+Complaints, checkout, verified reviews
+Platform verification, subscriptions, moderation,
+support
+MVP - Deferred
+General inventory management
+Full accounting / general ledger / P&L
+Payroll and staff attendance
+Visitor/security-desk module
+Native Android/iOS apps
+AI chatbot or AI recommendations
+Sponsored ranking
+Platform-held rent wallet
+Automated dispute arbitration
+Live traffic/commute-time prediction
+Launch strategy assumptions
+SCOPE-001 The marketplace shall launch only in Islamabad and Rawalpindi; architecture shall remain city-extensible.
+SCOPE-002 The management application shall be designed desktop-first for owners/managers while remaining mobile responsive for
+frequent quick actions.
+SCOPE-003 English is the MVP interface language; strings shall be localization-ready for future Urdu support.
+SCOPE-004 The platform shall prioritize marketplace density and verified live availability over national geographic breadth.
+Detailed implementation rules
+No scope creep. Features deferred from MVP must not be silently
+added into core database or navigation at the expense of booking/rent
+reliability.
+Integration posture. External payment, SMS/WhatsApp, map and
+email providers shall be abstracted so providers can be replaced
+without rewriting core domain logic.
+Responsive scope. Customer marketplace is mobile-first;
+management is desktop-first but responsive. Native apps are not
+required for launch.
+Availability objective. The platform shall remain usable when optional
+third-party services such as map or messaging providers are
+temporarily unavailable.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 5 of 50
+=== PAGE 6 ===
+IDENTITY & ROLES
+User Classes & Role
+Model
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Guest
+Browses, searches, compares and
+views complete public hostel details
+without login.
+Customer / Resident
+Books, chats, visits, pays rent,
+receives receipts, raises complaints
+and manages one active stay.
+Hostel Owner
+Full access to every owned hostel/
+brand/branch and combined cross-
+branch reporting.
+Branch Manager
+Operational access only to the single
+assigned branch. Cannot self-assign
+or view another branch.
+Platform Root Admin
+Highest platform authority; maximum
+three accounts; normal admins
+cannot manage Root Admins.
+Platform Normal Admin
+Verification, Billing, Support and
+Content Moderation roles with least-
+privilege access.
+Identity can carry multiple product roles
+A single person may be both Customer and Owner/Manager. The platform shall attach roles to one identity rather than creating
+duplicate accounts.
+Authenticated User → Continue as Customer or Hostel Management
+Detailed implementation rules
+Guest boundary. Guest browsing never grants resident-specific or
+management-specific data access.
+Resident transition. Resident is a state/context of a Customer identity
+created by an active ResidentStay, not a separate login identity.
+Owner identity. An Owner can also use the marketplace as a
+Customer without creating a second account.
+Platform separation. Platform Admin accounts are operational
+platform identities and do not obtain hostel ownership merely through
+admin authority.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 6 of 50
+=== PAGE 7 ===
+ACCESS CONTROL
+Ownership, Branch Scope & Privacy
+Boundaries
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Owner vs Manager access
+Capability Owner Branch Manager
+Owned brands / hostels All Assigned hostel/branch only
+Branch switcher All owned branches + combined view No unauthorized branches shown
+Residents All branches Assigned branch only
+Exact resident-to-seat mapping Yes Yes, assigned branch only
+Rent Board All branches / combined Assigned branch only
+Booking approval Yes Assigned branch
+Payment-proof approval Yes Assigned branch
+Manager appointment / firing Yes No
+Subscription ownership Yes No
+Cross-branch analytics Yes No
+Ownership transfer/settings Yes No
+Security invariant. Branch isolation must be enforced in backend authorization queries,
+not by merely hiding branches from the interface.
+Public privacy boundary
+Marketplace customers may see whether a particular seat is available or occupied, but they shall never see the identity of the
+person occupying a seat. Exact resident-to-seat mapping is private to the Owner and authorized Manager of that branch.
+Detailed implementation rules
+Object-level checks. Every read/write on Branch, Room, Seat,
+ResidentStay, Invoice, Payment and Complaint must verify that the
+acting management user is authorized for that branch.
+Combined owner view. All-Branches dashboards may aggregate
+data, but drill-down actions must still bind to a concrete branch before
+mutation.
+Manager offboarding. Once a Manager is suspended/deactivated,
+existing sessions must be revoked or lose management authorization
+immediately.
+Public seat data. Public seat identifiers may be shown for selection,
+but shall not reveal occupant history or previous residents.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 7 of 50
+=== PAGE 8 ===
+AUTHENTICATION
+Customer Registration, Identity &
+Profile
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Customer onboarding
+Create Account → Mobile OTP → Email OTP → Profile Ready
+AUTH-C-001 Customer registration shall require full legal name, CNIC, mobile number, email and gender.
+AUTH-C-002 Mobile number and email shall be verified during registration through OTP.
+AUTH-C-003 MVP customers shall be 18 years of age or older; under-18 B-Form/guardian identity onboarding is outside MVP.
+AUTH-C-004 CNIC shall normally be unique to one customer identity. Duplicate conflicts shall trigger recovery/reconciliation instead of a
+duplicate account.
+AUTH-C-005 Permanent address is part of the profile and must be completed no later than booking.
+AUTH-C-006 Current location shall be permission-based; manual location selection shall remain available if location permission is denied.
+Profile fields
+Required / Core Optional / Contextual
+Full name, CNIC, verified mobile, verified email, gender, permanent address Profile photo
+18+ eligibility University / employer
+Current/manual location Desired living region
+Booking and stay history Saved search context
+Detailed implementation rules
+OTP controls. OTP codes shall expire, have attempt limits, rate limits
+and cooldown behavior to reduce brute-force and SMS/email abuse.
+CNIC normalization. CNIC input should be normalized to one
+canonical format before uniqueness checks while preserving a user-
+friendly display format.
+Profile correction. Verified identity-field changes such as CNIC
+require a controlled update process and must not be editable by hostel
+management.
+Location fallback. If geolocation permission is denied or unavailable,
+all essential search and booking features remain accessible through
+manual area selection.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 8 of 50
+=== PAGE 9 ===
+MANAGEMENT AUTHENTICATION
+Owner Registration & Manager
+Appointment
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Owner self-registration
+Hostel Owners may self-register, verify their identity/contact information, create the first hostel/branch and submit it to Platform
+verification.
+Manager appointment is Owner-controlled
+Owner: Add Manager → Enter mobile + branch → 24h temporary password → Manager sets permanent
+password
+AUTH-M-001 A Manager shall not self-claim a hostel. The Owner appoints the Manager from Staff & Permissions.
+AUTH-M-002 The Owner enters the Manager mobile number and assigns exactly one branch for MVP.
+AUTH-M-003 The 24-hour temporary password may be Owner-defined or system-generated. It must be single-use, securely hashed, rate-
+limited and invalidated after successful activation.
+AUTH-M-004 After entering mobile number + temporary password, the Manager must choose a permanent password before normal
+access is granted.
+AUTH-M-005 Subsequent Manager login uses mobile number + permanent password.
+AUTH-M-006 The Owner may appoint, suspend, fire/deactivate and replace Managers at any time; historical actions remain auditable.
+Temporary-password rule. If the Owner manually creates it, complexity rules apply and
+the platform must not reveal the plaintext again after creation.
+Detailed implementation rules
+Owner account. Owner self-registration should verify mobile/email
+and require a permanent secret/password for returning management
+access; stronger MFA can be added later.
+Manual temp password. When Owner chooses the temporary
+password, minimum length/complexity and banned-password checks
+apply; the plaintext is not recoverable after creation.
+System temp password. When system-generated, the credential
+should use cryptographically secure randomness and be shown only
+through the intended onboarding channel.
+Invite collision. If the invited mobile already belongs to an existing
+customer account, the Manager role is attached after successful
+invitation verification rather than creating a duplicate user.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 9 of 50
+=== PAGE 10 ===
+MANAGEMENT AUTHENTICATION
+Manager Lifecycle, Appointment &
+Removal
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Manager lifecycle
+Appointed → Temporary Access → Active → Suspended / Deactivated
+MGR-001 A branch may have multiple Managers, but each Manager is assigned to one branch in MVP.
+MGR-002 A Manager cannot change their branch assignment, promote themselves or add themselves to another branch.
+MGR-003 Only the Owner appoints or removes Managers in MVP. Managers cannot appoint or fire other Managers.
+MGR-004 On firing/deactivation, management access ends immediately but customer identity and historic actions remain intact.
+MGR-005 Historic records shall continue to show which Manager approved a payment, booking or resident transfer even after that
+Manager leaves.
+MVP staff scope
+The dedicated authenticated staff onboarding flow is required for the Manager role. Additional role-specific staff accounts such as
+Accountant, Reception, Mess Manager or Maintenance may be added later without changing the core Owner/Manager access
+model.
+Future-ready. The role/permission architecture should allow subordinate staff later, but the
+MVP must not be delayed by building unnecessary staff HR workflows.
+Detailed implementation rules
+Suspend vs fire. Suspend is reversible temporary access removal;
+Fire/Deactivate ends the branch assignment and requires a new
+appointment to regain access.
+Replacement manager. Firing one Manager does not affect other
+Managers assigned to the same branch.
+Audit continuity. Deactivation must not anonymize the Manager
+name from historic approvals unless a legal/privacy process
+specifically requires it.
+No privilege transfer. A departing Manager cannot transfer their
+branch role to another person; only the Owner can appoint a
+replacement.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 10 of 50
+=== PAGE 11 ===
+COMMERCIAL MODEL
+Hostel Brands, Branches, Trials &
+Pricing
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Commercial hierarchy
+Owner Account
+May own multiple hostel
+brands
+Hostel / Brand
+Logical group or property
+identity
+Branch
+Operational + subscription
+unit
+BRN-001 An Owner account may manage multiple different hostel brands as well as multiple branches under one brand.
+BRN-002 The Owner shall be able to view each branch independently and an All Branches combined dashboard.
+BRN-003 Every newly Platform-approved branch receives its own three-month free trial starting from the approval date.
+BRN-004 After trial, the primary/main branch subscription is PKR 5,000/month.
+BRN-005 Each additional branch subscription is PKR 3,500/month.
+BRN-006 Subscription expiry is branch-specific. One expired branch becomes read-only without disabling other active paid branches.
+Example
+F-8 main branch: PKR 5,000
+G-10 branch: PKR 3,500
+Rawalpindi branch: PKR 3,500
+Total after trials: PKR 12,000/month
+Platform configurability
+Root Admin shall be able to change subscription prices or
+trial duration later. Already-paid periods must not be
+retroactively repriced.
+Detailed implementation rules
+Primary branch definition. For billing, one branch under the Owner
+account is designated as the primary/main branch; additional active
+branches use the additional-branch price.
+Branch archival. Closing a branch archives it and its historical
+operations; it must not erase residents, invoices, receipts or audit
+history.
+Trial independence. Adding a branch later starts that branch’s own
+trial on approval without resetting trials or billing periods for existing
+branches.
+Combined reporting. Combined Owner metrics must clearly
+distinguish active, trial, expired and archived branches so totals are
+not misleading.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 11 of 50
+=== PAGE 12 ===
+MARKETPLACE SEARCH
+Geography, University & Workplace
+Discovery
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Location hierarchy
+City → Zone / Area / Sector → Sub-area → Coordinates
+GEO-001 Initial city filter shall contain Islamabad and Rawalpindi.
+GEO-002 Platform Admin shall manage granular sectors, areas and sub-areas so customers can search small local regions.
+GEO-003 Universities, offices and business hubs shall store name, address and coordinates for distance-based search.
+GEO-004 Customer may search by current location, manual location, area, university, office or map point.
+GEO-005 MVP may show physical distance; live traffic/travel-time prediction is deferred.
+University discovery
+The marketplace shall support dedicated discoverability around major universities, including university-focused landing/search
+pages where useful. Examples include NUST, FAST, COMSATS, NUML, IIUI, QAU and other Admin-managed institutions.
+Search objective. A customer should be able to express: “Show me a girls hostel in
+Islamabad within 3 km of my university, under my budget, with an available seat.”
+Detailed implementation rules
+Geocoding precision. Admin-managed coordinates are authoritative
+for university/workplace distance calculations; text address alone
+should not be used where coordinates exist.
+Area hierarchy. Sub-areas inherit their city/area relationships and
+cannot be linked to inconsistent parent locations.
+Search aliases. Platform may store alternate spellings/aliases for
+local areas and universities to improve search without duplicating
+canonical records.
+Exact address. Approved hostel exact address is public under current
+business rules; internal coordinates remain the authoritative location
+record.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 12 of 50
+=== PAGE 13 ===
+MARKETPLACE SEARCH
+Marketplace Filters, Sort &
+Ranking
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Required search filters
+City / area / sector / sub-area
+University / office / business hub
+Distance: 1 / 3 / 5 / 10 km
+Minimum and maximum monthly rent
+Security deposit
+Boys / Girls / Working Professional Male / Female
+Room type / seater capacity
+Available now / selected date
+AC, attached bath, Wi-Fi, laundry, parking, CCTV,
+backup power, geyser, cupboard, study table, cleaning,
+drinking water
+Mess/menu and transport availability
+Organic ranking inputs
+Search/location relevance
+Real seat availability
+Verified status
+Filter match quality
+Rating quality
+Listing completeness
+Availability freshness
+Owner response performance
+No hidden paid rank. Sponsored ranking
+is outside MVP. Future sponsored results
+must be clearly labeled.
+Sorting
+Recommended Nearest Lowest Price Highest Price Highest Rated Most Available
+Detailed implementation rules
+Filter interaction. Filters should combine using AND semantics unless
+explicitly stated; zero-result states should explain which filters can be
+relaxed.
+Availability filter. Available Now means at least one publishable seat
+is currently available under active branch availability state.
+Price filter. Room/seat search price uses actual configured room
+price, not a misleading hostel-wide marketing price.
+Ranking safeguards. A hostel with stale/expired subscription
+availability cannot receive a live-availability ranking advantage.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 13 of 50
+=== PAGE 14 ===
+MARKETPLACE UX
+Marketplace Cards, Hostel Detail & Parent
+Share
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Compact homepage / search card
+ABC Boys Hostel Verified
+F-8, Islamabad · 4.7 ★ · Starting from PKR 12,000/seat
+Near NUML (1.8 km) · FAST (3.2 km) · Available seats shown from live branch data
+The compact card should show only decision-driving summary data: name, location, rating, Verified badge, starting price/
+availability and at most one or two nearby universities. Opening the card reveals the complete listing.
+Hostel detail page
+Area Required public detail
+Identity Hostel/branch name, Verified badge, exact public address, map
+Commercial Room-specific rent, security deposit, cancellation policy
+Availability Room number/type and available/occupied seat state; no resident identity
+Visuals Hostel gallery, room photos, specific selectable-seat photo
+Experience Amenities including parking, mess/menu, transport, rules, visiting hours
+Trust Ratings, verified resident reviews, verification status
+Actions Favorite, compare, share, chat, visit request, waiting list, Request to Book
+Parent share view. Customers shall be able to share a clean guardian/parent-friendly
+hostel summary containing verification, location, pricing, security deposit, rooms, amenities,
+menu, rules and reviews.
+Detailed implementation rules
+Card freshness. If live availability is unavailable or stale, the compact
+card must not show an exact current seat count.
+Comparison. Hostel comparison should normalize rent, deposit,
+distance, room type, amenities, mess, transport, rating and availability
+across selected listings.
+Share privacy. Parent/guardian share links contain public listing data
+only and never include customer profile, booking or payment
+information unless the customer explicitly shares a private receipt.
+Structured detail. Room and seat details must remain readable and
+comparable on mobile; long hostel descriptions cannot push pricing/
+availability below critical actions.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 14 of 50
+=== PAGE 15 ===
+TRUST SYSTEM
+Marketplace Trust, Verification & Listing
+Quality
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Verification signals
+Owner
+Identity/contact verified.
+Location
+Address/map reviewed.
+Photos
+Hostel/room media
+reviewed.
+Platform
+Approved listing = Verified
+Hostel.
+TRUST-001 Only Platform-approved hostel listings may become public and receive the Verified badge.
+TRUST-002 Platform Admin shall review owner identity, location, hostel/room photos, pricing, security deposit, category, contact details
+and ownership/lease evidence.
+TRUST-003 Content Moderator may reject fake, misleading, duplicate, inappropriate or severely poor-quality photos.
+TRUST-004 An internal listing-completeness score shall be visible to Platform staff for quality control; it shall not be displayed to
+customers.
+TRUST-005 The MVP shall not include a separate Availability Health Score.
+TRUST-006 Major ownership/address/identity changes trigger re-review; routine menu and live availability updates do not require full
+reverification.
+Detailed implementation rules
+Verification evidence. Verification records keep reviewer, date,
+submitted evidence and decision reason so later audits can
+reconstruct why a listing was approved.
+Suspension distinction. Suspending public listing does not
+automatically delete or alter internal resident/rent records.
+Completeness score. Completeness is an internal quality-control
+metric and may influence moderation/ranking logic, but it is not a
+public trust badge.
+Reapproval. Changes Requested and re-verification use versioned
+submissions so the previous approved listing can be distinguished
+from pending changes.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 15 of 50
+=== PAGE 16 ===
+HOSTEL SETUP
+Owner Onboarding & Branch
+Verification
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Owner onboarding sequence
+Owner Profile → Brand/Branch → Rooms/Seats → Pricing &
+Photos → Submit → Verified
+Verification statuses
+Draft Submitted Under Review Changes Requested Approved Rejected Suspended
+ONB-001 A listing remains private until Platform Admin approves it.
+ONB-002 Admin may request changes or reject. The owner may correct and resubmit after Changes Requested.
+ONB-003 Each branch has independent verification and subscription state.
+ONB-004 Trial starts on branch approval, preventing setup/review time from consuming the free period.
+Owner setup acceleration
+The management system should support room duplication and CSV/Excel import to reduce manual onboarding for large hostels.
+Import targets include rooms, seats, residents and relevant opening balances/records where supported.
+Detailed implementation rules
+Required onboarding data. The system should prevent Submit for
+Verification until mandatory property identity, location, pricing, security
+deposit, room/seat structure and required photos are complete.
+Draft safety. Owners may save incomplete drafts without public
+exposure.
+Import review. Bulk imports should support preview and validation
+before commit; malformed rows do not create partial resident/seat
+records.
+Verification notification. Owner receives explicit notification for
+approval, rejection or requested changes and can see the review
+reason in management.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 16 of 50
+=== PAGE 17 ===
+HOSTEL SETUP
+Property Hierarchy & Bulk
+Setup
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Operational hierarchy
+Owner → Brand / Hostel → Branch → Building → Floor → Room → Seat
+PROP-001 Property structure shall preserve historical links. Buildings, floors, rooms and seats with historical records are archived/
+inactivated instead of hard-deleted.
+PROP-002 Room capacity reductions shall be blocked when they conflict with current occupied seat assignments.
+PROP-003 The same Owner may switch among branches while a Branch Manager remains restricted to their assigned branch.
+Bulk setup tools
+Duplicate Room
+Create one configured room and duplicate it across a
+number range, retaining capacity, type, pricing and
+amenities.
+CSV / Excel Import
+Import large opening datasets using validated templates.
+Errors must be reported row-by-row without partially
+corrupting branch data.
+Detailed implementation rules
+Room duplication. Duplicate-room operation shall generate unique
+room numbers and unique seat identifiers; collisions are blocked
+before creation.
+Import idempotency. Re-uploading the same import file must not
+silently create duplicate rooms/residents; an import run identifier and
+duplicate strategy should be used.
+Opening balances. Imported financial opening data, if supported,
+must be clearly marked as opening/migrated records rather than
+fabricated payment transactions.
+Archive dependency. A branch/building/floor cannot be hard deleted
+if lower-level rooms/seats or historical records depend on it.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 17 of 50
+=== PAGE 18 ===
+ROOMS & SEATS
+Room Pricing, Seat Identity & Mandatory
+Photos
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Room-specific pricing
+Pricing is not one hostel-wide number. Different rooms and capacities may have different per-seat rent.
+Example room Capacity Pricing model Monthly price
+Room 101 3 seats Per seat PKR 12,000 per seat
+Room 102 4 seats Per seat PKR 10,000 per seat
+Room 201 2 seats / AC Per seat PKR 18,000 per seat
+Room 202 1 Per room PKR 30,000 per month
+ROOM-001 Each room stores room number, floor/building, capacity, room type, price, eligibility, photos, amenities, description and
+status.
+ROOM-002 Each selectable seat stores its own seat/bed identifier and specific photo.
+ROOM-003 If a Manager marks a seat publicly available, the room photos and that specific seat photo are mandatory before the seat can
+be published as selectable.
+ROOM-004 A customer selecting a seat shall be able to inspect room photos and the specific seat photo before requesting it.
+ROOM-005 Parking shall exist as a standard amenity option.
+Detailed implementation rules
+Price effective date. Room pricing changes require an effective date.
+Existing confirmed booking price and issued invoices remain
+unchanged unless an explicit approved adjustment is created.
+Seat image validation. Seat photos must be image media with size/
+type limits; duplicate or unusable media may be rejected by Platform
+content review.
+Room type flexibility. Room types are configurable because hostel
+naming varies; capacity validation remains numeric and authoritative.
+Availability publication. A seat with missing mandatory photo may be
+internally Available but shall be excluded from public selectable
+inventory until the requirement is satisfied.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 18 of 50
+=== PAGE 19 ===
+ROOMS & SEATS
+Public vs Internal Seat
+Representation
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Marketplace seat view
+Room 203 - 3 Seater - PKR 12,000/seat
+B1 - Occupied
+B2 - Available
+B3 - Occupied
+Public customers see only availability state. Reserved or
+Maintenance seats are treated as unavailable/not selectable; no
+internal booking or resident data is exposed.
+Owner / Manager view
+Room 203
+B1 - Ali Khan
+B2 - Available
+B3 - Hamza Ahmed
+Exact resident-to-seat mapping is visible only to the Owner and
+authorized Manager of the branch.
+SEAT-001 Public marketplace shall never show resident names, CNIC, phone or other occupant identity.
+SEAT-002 A seat may exist internally without being marketplace-published if its mandatory public content is incomplete.
+SEAT-003 Seat availability changes shall synchronize from management events to marketplace state.
+SEAT-004 Seat photo and room photo access shall use secured upload/storage rules; resident-only documents must not share public
+media URLs.
+Detailed implementation rules
+Reserved behavior. A Reserved seat is unavailable to other
+customers but should not disclose who reserved it or why.
+Maintenance behavior. Maintenance seats are omitted from available
+inventory and cannot receive a new active assignment until returned to
+Available.
+Occupancy truth. Occupied state is derived from an active
+assignment/check-in and cannot be toggled to Available while the
+active resident assignment still exists.
+Photo history. Replacing a public seat photo does not alter historical
+booking/receipt records; listing media history may be retained for
+moderation.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 19 of 50
+=== PAGE 20 ===
+CORE MANAGEMENT
+Bed Board & Real-Time
+Occupancy
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Bed Board - core operational screen
+The Bed Board answers: Who lives where, and which seat is actually available?
+Floor 2 · Room 203
+B1 - Occupied - Ali Khan
+B2 - Available
+B3 - Reserved
+Floor 2 · Room 204
+B1 - Occupied - Usman
+B2 - Maintenance
+B3 - Available
+B4 - Occupied - Bilal
+BED-001 Internal seat states are Available, Reserved, Occupied and Maintenance.
+BED-002 Clicking an Occupied seat opens the authorized resident/stay view; clicking Available provides booking/walk-in/maintenance
+actions.
+BED-003 Walk-in additions, confirmed bookings, check-ins, transfers, checkout and maintenance state changes shall update
+availability consistently.
+BED-004 Backend concurrency controls shall prevent double assignment of the same seat.
+Design requirement. Bed Board must work efficiently on desktop at high density and
+remain usable on mobile for quick operational actions.
+Detailed implementation rules
+Atomic transitions. Check-in, checkout and transfer operations must
+update assignment and seat state in one transactional operation.
+Reservation conflict. A seat cannot enter Reserved if it is Occupied,
+Maintenance or already reserved by another live reservation.
+Transfer validation. Resident transfer destination must be Available
+and in an authorized branch. MVP does not permit one resident to
+occupy two active seats.
+Board filtering. Owner/Manager may filter Bed Board by building,
+floor, room type and state without losing authorization boundaries.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 20 of 50
+=== PAGE 21 ===
+BOOKING
+Booking Request, Approval & Price
+Lock
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Booking lifecycle
+Submitted → Under Review → Approved → Reservation /
+Required Payment → Confirmed
+BKG-001 Customers may maintain a maximum of three simultaneous active booking requests.
+BKG-002 Manager/Owner shall approve or reject. Rejection requires a reason.
+BKG-003 Room/seat rent and security deposit are configured before publication and explicitly shown in the marketplace before
+booking.
+BKG-004 The seat is booked at the displayed price captured on the booking record. Later price changes must not silently alter an
+existing approved/confirmed booking.
+BKG-005 There is no separate platform or hostel booking-confirmation fee. Any upfront amount must be part of the disclosed rent/
+security-deposit arrangement.
+BKG-006 Approval/reservation expiry is configurable by the hostel Manager/Owner and expired offers automatically release availability
+as defined by policy.
+Detailed implementation rules
+Application snapshot. Booking record stores the room/seat,
+displayed rent, deposit, selected dates and policy version visible when
+the request was submitted.
+Manager response. Repeated booking expiry/no-response behavior
+is measured for owner performance warnings and marketplace quality
+metrics.
+Withdraw. Customer may withdraw an unconfirmed request.
+Withdrawal releases associated reservation state according to branch
+policy.
+Eligibility. Booking validation shall enforce hostel category/gender
+eligibility and prevent incompatible requests from reaching
+confirmation.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 21 of 50
+=== PAGE 22 ===
+BOOKING
+Reservation, Booking Payment & Expiry
+Rules
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Booking payment rule
+The Manager/Owner may configure whether a disclosed security deposit and/or rent payment is required before confirmation. The
+platform must not introduce a hidden extra booking fee.
+BKG-007 If a payment is required, the customer pays directly to the hostel payment account/method configured for that branch.
+BKG-008 The platform does not hold booking money. It records proof/status and enables Owner/Manager verification.
+BKG-009 A seat under an active reservation must not be simultaneously confirmed to another customer.
+BKG-010 Reservation/offer expiry is branch-configurable. The system shall release expired reservations automatically and record
+status history.
+Booking statuses
+Draft Submitted Under Review Approved Payment Pending Verification Pending Confirmed Rejected
+Withdrawn Expired Cancelled Checked In Completed
+Pricing transparency. Monthly rent, security deposit and any required pre-check-in amount
+must be visible before the customer commits.
+Detailed implementation rules
+Cancellation disclosure. Hostel-specific cancellation policy must be
+accepted/acknowledged before a payment-dependent booking is
+confirmed.
+Expiry logging. Automatic expiry is recorded in BookingStatusHistory
+with timestamp and configured rule used.
+Proof retry. Rejected proof may be resubmitted according to branch
+configuration without creating a second booking for the same seat.
+No hidden fee. Any amount not represented as disclosed rent,
+security deposit or approved optional service shall not be collected as
+a booking-confirmation fee in MVP.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 22 of 50
+=== PAGE 23 ===
+BOOKING SUPPORT
+Visits, Chat & Waiting
+List
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Visit Request
+Customer selects a time inside
+Manager-configured visiting hours.
+Manager can approve, reschedule or
+reject.
+In-App Chat
+Logged-in customers may chat
+before booking. Safe images/PDFs
+allowed; dangerous executable
+uploads blocked.
+Waiting List
+Customer may wait for a hostel/room
+type. Availability sends an alert; it
+never auto-books.
+COMM-001 Hostel public contact visibility is controlled by management. In-app chat remains available according to platform rules.
+COMM-002 Platform Admin shall not normally read private chat. Reported/safety-investigation access must be authorized and audited.
+WAIT-001 Management may publish an expected vacancy date for currently full room types where useful.
+VISIT-001 After a visit, the application may prompt the customer whether they remain interested, without aggressive repetitive
+reminders.
+Detailed implementation rules
+Visit conflict. Visit requests must respect configured visiting hours
+and may be rescheduled rather than silently changed.
+Chat attachment security. File type, size and malware-risk validation
+applies before an attachment becomes available to the other party.
+Report linkage. A report raised from chat/listing should capture the
+relevant object/message reference without giving moderators
+unrestricted access to unrelated conversations.
+Waiting-list dedupe. The same customer should not accumulate
+duplicate active waiting-list entries for the same branch/room
+preference.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 23 of 50
+=== PAGE 24 ===
+RESIDENT PORTAL
+Upcoming Stay, Active Hostel & Past
+Stays
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Customer stay areas
+Booking Confirmed → Upcoming Stay → Checked In → Active Hostel → Checked Out → Past Stays
+STAY-001 Booking confirmation alone does not create an Active Hostel. Only Owner/assigned Manager can mark the resident Checked
+In.
+STAY-002 After check-in, the current branch appears in Active Hostel and resident-specific features are enabled.
+STAY-003 A customer may have only one Active Hostel at a time in MVP.
+STAY-004 After checkout, the branch moves to Past Stays. Historical receipts, payments and eligible review access remain, while Pay
+Rent and new complaint creation are disabled.
+Active Hostel modules
+My Room & Seat Rent & Payments Receipts Complaints Mess / Menu Transport Notices Chat
+Checkout Request Security Deposit
+Detailed implementation rules
+Access gate. Active Hostel routes/API require an active ResidentStay
+belonging to the authenticated customer and target branch.
+Upcoming permissions. Upcoming Stay may show booking/arrival
+information but must not expose monthly resident operations such as
+rent invoice or complaints before check-in.
+Past permissions. Past Stay retains read-only historical records and
+review eligibility; operational actions are disabled.
+New hostel transition. After prior checkout, a future checked-in stay
+can become the one Active Hostel without deleting the old Past Stay.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 24 of 50
+=== PAGE 25 ===
+RESIDENT MANAGEMENT
+Resident Record, Walk-In Admission &
+Transfers
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Resident record
+Category Examples
+Identity Name, CNIC, verified contact, permanent address, gender
+Guardian / Emergency Father/guardian name, guardian phone, emergency contact
+Context University/company, admission/check-in date, expected leaving date
+Assignment Brand, branch, building, floor, room, seat
+Documents Agreement, optional CNIC image, student/employee card, police verification
+Financial Rent, security deposit, invoices, receipts, advance/outstanding
+Operations Complaints, transfer history, checkout history
+RES-001 Management may add walk-in residents so actual occupancy remains correct even when the marketplace was not used.
+RES-002 If a walk-in matches an existing customer identity, the stay must link to that account instead of creating a duplicate identity.
+RES-003 If the walk-in does not yet have an activated customer account, management may record occupancy immediately; resident
+portal access begins after account activation/linking.
+RES-004 Only Owner and authorized Branch Manager can see exact resident-to-seat mapping.
+RES-005 A transfer preserves old assignment, new assignment, timestamp, actor and reason.
+Detailed implementation rules
+Agreement versioning. Agreement acceptance stores agreement
+version and acceptance metadata so later rule changes do not
+overwrite what the resident originally accepted.
+Document access. Optional resident documents are not public listing
+assets and require authenticated authorization.
+Walk-in uniqueness. Before creating a walk-in identity, search
+normalized CNIC/mobile/email to avoid duplicate residents.
+Expected leaving date. Expected checkout is planning data and may
+change without changing historical check-in or booking timestamps.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 25 of 50
+=== PAGE 26 ===
+RENT MANAGEMENT
+Monthly Rent Engine & Invoice
+Rules
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Monthly rent generation
+Active Resident → Monthly Invoice → Pay Rent → Proof Submitted → Approved → Receipt
+RENT-001 Each checked-in resident shall receive recurring monthly rent invoices according to the branch billing configuration.
+RENT-002 Rent amount derives from the resident’s assigned room/seat pricing and any effective-dated approved change.
+RENT-003 Already issued or paid invoices shall not be silently rewritten after a rent change.
+RENT-004 The platform shall calculate due, paid, outstanding and advance balances.
+RENT-005 Partial payments may be enabled by the Manager/Owner; advance payments are supported.
+RENT-006 Most standard hostel services may be included in the disclosed rent. Optional transport is separately chargeable when
+selected.
+Billing discipline. A seat cannot turn “Paid/Green” without an actual payment record linked
+to an invoice.
+Detailed implementation rules
+Invoice schedule. Branch billing configuration defines the monthly
+due day and grace period; invoice generation should be deterministic
+for all active residents.
+Mid-cycle transfer. If room transfer changes rent mid-cycle, MVP
+should use an explicit effective-date adjustment rule rather than
+silently rewriting the month.
+Advance allocation. Advance balance is applied according to branch
+policy and must remain traceable to source payments.
+Invoice identity. Each invoice has a unique immutable identifier used
+by payment proof, receipt and reporting.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 26 of 50
+=== PAGE 27 ===
+RENT MANAGEMENT
+Active Hostel - Pay Rent
+Flow
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Resident payment experience
+October 2026 Rent
+ABC Boys Hostel - F-8 Branch
+Room 203 · Seat B2
+Amount: PKR 12,000
+Due: 5 October · Status: Unpaid
+Pay Rent
+PAY-001 Pay Rent shall appear only inside the customer’s Active Hostel and only for an issued invoice.
+PAY-002 Unrelated hostels shall never appear in the resident payment interface.
+PAY-003 Payment destination details shall come from the active branch’s configured bank/JazzCash/Easypaisa/Raast/card methods.
+PAY-004 Money flows directly from resident to hostel. The platform does not operate a rent wallet in MVP.
+PAY-005 Each invoice/payment shall have a unique reference suitable for branch reconciliation.
+Payment proof inputs
+Field Rule
+Invoice Auto-linked
+Amount Auto-filled / validated
+Payment method Required
+Transaction/reference ID Required where available
+Payment date Required
+Screenshot / receipt proof Required for manual verification flow
+Detailed implementation rules
+Branch account display. Only payment accounts enabled for the
+resident’s active branch are displayed; another branch’s bank/account
+details are never shown.
+Proof confirmation. After upload, the customer sees a timestamped
+Pending Verification state and may view their submitted evidence.
+Duplicate submit. Client retries/network duplication must not create
+duplicate payment proofs for the same submission token.
+No false paid state. Uploading a screenshot alone never marks rent
+Paid; verification is mandatory in the manual MVP flow.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 27 of 50
+=== PAGE 28 ===
+RENT MANAGEMENT
+Payment Proof Review, Approval &
+Receipt
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Proof verification
+Proof Submitted → Pending Verification → Owner / Branch Manager
+Approves → Paid + Receipt
+PAY-006 Only Hostel Owner or assigned Branch Manager may give final rent-payment approval in MVP.
+PAY-007 The approver shall see resident, branch, room/seat, invoice, amount, method, transaction reference, submitted date and
+proof image.
+PAY-008 Approval must atomically update payment status, invoice balance, Rent Board state, receipt generation and customer
+notification.
+PAY-009 Rejection requires a reason. The customer sees the reason and the invoice remains unpaid/pending retry.
+PAY-010 Future payment APIs may auto-verify supported transactions, but manual proof approval is the MVP baseline.
+Receipt. Immediately after manual approval, the resident can download/share a receipt
+with parents/guardians.
+Detailed implementation rules
+Approval idempotency. Repeated clicks/retries on Approve must
+produce one approved payment and one receipt, not duplicates.
+Amount mismatch. If submitted amount differs from invoice/
+outstanding amount, approver sees the discrepancy before decision.
+Rejection reasons. Examples include payment not received, wrong
+amount, wrong transaction, unreadable proof or duplicate proof; Other
+requires a note.
+Receipt immutability. Generated receipt data is based on the
+approved payment snapshot and should not silently change after
+issue.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 28 of 50
+=== PAGE 29 ===
+RENT MANAGEMENT
+Rent Board - Monthly Collection
+Status
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Monthly Rent Board
+Green - Paid & verified Yellow - Proof pending Orange - Partial payment Red - Overdue after grace
+Neutral - Due, not overdue Silver - Vacant seat
+Room 203
+B1 - Ali - Paid
+B2 - Hamza - Overdue
+B3 - Vacant
+Room 204
+B1 - Hassan - Pending
+B2 - Bilal - Partial
+B3 - Usman - Due
+B4 - Ahmed - Paid
+RB-001 Rent Board colors are internal Owner/Manager management states; marketplace customers shall never see resident rent
+status.
+RB-002 Before due date/grace expiry, unpaid rent is neutral rather than red.
+RB-003 Clicking a resident/seat opens invoice summary, payment history, proof review and reminder actions as authorized.
+RB-004 Owner may view Rent Board per branch and in combined cross-branch summary form.
+Detailed implementation rules
+Color accessibility. Status must be communicated by label/icon in
+addition to color so the board remains usable for color-vision
+deficiencies and exports.
+Month selector. Rent Board defaults to current billing month but
+supports historical month view without altering current status.
+Vacant rule. Silver means no active resident assignment for that seat;
+it is not a financial status and no rent invoice is expected for that seat.
+Partial state. Orange is used only when partial payments are enabled
+and total approved payments are below current invoice balance.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 29 of 50
+=== PAGE 30 ===
+RENT MANAGEMENT
+Receipts, Security Deposit, Late Fees &
+Discounts
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Receipts
+Unique receipt number
+Hostel/branch
+Resident
+Room/seat
+Invoice month
+Amount
+Payment method/reference
+Payment and approval dates
+Approved by
+Downloadable/shareable PDF
+Security deposit
+Required amount publicly disclosed
+Amount received
+Deductions
+Deduction reason
+Refundable balance
+Refund status/date
+Optional refund proof/reference
+FIN-001 Security-deposit changes apply prospectively; confirmed resident deposits are not silently changed.
+FIN-002 Late fee and grace period are Manager/Owner configurable. Late fee may be fixed/percentage/manual or disabled, and
+applications/revocations are audited.
+FIN-003 Discounts/concessions require Manager/Owner approval and effective-date history.
+FIN-004 Generic arbitrary one-time charges are not provided as an unrestricted MVP feature.
+Detailed implementation rules
+Deposit ledger. Deposit receipt, deductions and refund are separate
+auditable records; deposit value is not treated as ordinary monthly rent
+income in the resident ledger.
+Deduction evidence. Reason is mandatory; optional evidence/
+reference may be attached under policy.
+Late-fee timing. Red/overdue state begins only after configured due
+date/grace logic, not immediately when a monthly invoice exists.
+Discount transparency. Approved discount should be visible on
+invoice/statement so customer and management reconcile to the same
+final amount.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 30 of 50
+=== PAGE 31 ===
+RENT MANAGEMENT
+Rent Reminders, Collection Summary &
+History
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Owner collection summary
+1.24MEXPECTED RENT
+980KCOLLECTED
+260KOUTSTANDING
+79%COLLECTION RATE
+COLL-001 Owner/Manager shall be able to send rent reminders to relevant unpaid residents without messaging paid residents.
+COLL-002 System notifications shall support upcoming due, due today, grace-period expiry, payment proof received and payment
+approved/rejected events.
+COLL-003 Historical payment records remain after checkout, room archival, staff departure or branch status change.
+COLL-004 Platform performance/analytics may measure use of rent tracking and collection behavior, but platform does not control
+resident-hostel financial disputes.
+Resident payment history
+Month Amount State Evidence
+October PKR 12,000 Paid Receipt #RCP-00182
+September PKR 12,000 Paid Receipt #RCP-00151
+August PKR 12,000 Paid Receipt #RCP-00117
+Detailed implementation rules
+Bulk reminder. Send reminder to unpaid should exclude Paid
+residents and respect branch/month/status filters.
+Reminder audit. System should record notification event and delivery
+attempt status without pretending external SMS/WhatsApp delivery
+succeeded when provider confirmation is unavailable.
+Collection rate. Collection metrics use approved payment amounts
+and expected invoice amounts for the selected period; cancelled/
+voided records are excluded appropriately.
+Exports. Historical monthly collection reports must reproduce the
+status/amounts for that reporting period rather than only current
+resident state.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 31 of 50
+=== PAGE 32 ===
+RESIDENT SERVICES
+Mess/Menu & Optional
+Transport
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Mess / Menu
+Manager defines the hostel meal arrangement. Menu is day-
+wise and editable.
+Day Breakfast Lunch Dinner
+Mon Paratha + Tea Daal Rice Chicken Karahi
+Tue Egg + Tea Biryani Daal
+Wed Custom Custom Custom
+Dish/menu photos are optional. Meal cost is normally part of the
+disclosed rent when included by the hostel.
+Transport
+Transport is an optional hostel-managed add-on.
+Route name
+Locations / stops
+Departure timings
+Monthly charge
+Resident opt-in / opt-out request
+Separate charge. Transport is not hidden
+inside the base rent when it is optional; its
+price must be visible to customers.
+SERV-001 The marketplace and Active Hostel shall display the currently configured menu.
+SERV-002 Transport exists only when the Manager has configured a route/service and price.
+Detailed implementation rules
+Menu version. Menu edits affect the displayed current/future menu
+and need not rewrite historical menus unless the product intentionally
+stores snapshots.
+No resident menu edit. Residents view the Manager-defined plan;
+residents do not modify the hostel’s core meal arrangement in MVP.
+Transport eligibility. Only branches with an active configured
+transport service can accept resident opt-in.
+Charge lifecycle. Transport activation/deactivation must have an
+effective date so monthly billing does not double-charge or omit the
+selected service.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 32 of 50
+=== PAGE 33 ===
+RESIDENT SERVICES
+Complaints, Resolution & Reopen
+Rules
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Complaint workflow
+Open → Assigned → In Progress → Resolved → Resident Confirms
+→ Closed
+CMP-001 Active residents shall have a dedicated complaint section linked to their current hostel/room/seat.
+CMP-002 Complaint categories include Electricity, Plumbing, Wi-Fi, Cleaning, Furniture, AC, Geyser, Mess, Security, Staff and Other.
+CMP-003 Safe image/document attachments may be uploaded with validation.
+CMP-004 Final closure requires management resolution plus resident acceptance; resident can reopen if the issue remains
+unresolved.
+CMP-005 Owner/Manager shall see open, in-progress, resolved and reopened complaints and basic resolution performance.
+CMP-006 After checkout, Past Stays do not allow creation of new operational complaints for the former stay.
+Detailed implementation rules
+Complaint ownership. Complaint is linked to reporting resident,
+active stay, branch and optionally room/seat for context.
+Reopen history. Reopening does not erase prior resolution attempt;
+status history preserves every transition and actor.
+Manager visibility. Manager can see complaints only for assigned
+branch; Owner can see across owned branches.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 33 of 50
+=== PAGE 34 ===
+RESIDENT LIFECYCLE
+Checkout, Deposit Settlement & Past
+Stay
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Checkout flow
+Notice / Checkout
+Request → Financial Review → Deposit Settlement → Checked Out → Past Stays
+OUT-001 Resident submits notice/checkout when leaving and seeking deposit settlement. Manager configures notice period.
+OUT-002 Emergency checkout may be requested but remains subject to disclosed notice/policy rules.
+OUT-003 Checkout financial review covers unpaid rent, advance balance, security deposit and supported service balances. Room-
+condition inspection is optional rather than a mandatory system checklist.
+OUT-004 Any security-deposit deduction records amount and reason. Resident dispute rights follow applicable policy; Platform Admin
+is not financial arbitrator.
+OUT-005 Final statement shows rent due, payments, outstanding, deposit, deductions, refund and final balance.
+OUT-006 After checkout, the seat becomes Available and marketplace availability updates if the branch subscription is active.
+Detailed implementation rules
+Notice calculation. Configured notice requirement and requested
+checkout date should be shown together so financial consequences
+are transparent.
+Checkout blocking. System may warn about unresolved financial
+items but Owner/Manager retains authority to complete checkout and
+record a final statement according to policy.
+Availability timing. Seat becomes Available only when checkout
+completion commits; merely submitting notice does not free the seat.
+Refund state. Deposit refund can be Pending/Completed with optional
+transfer reference; lack of platform arbitration does not mean lack of
+audit evidence.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 34 of 50
+=== PAGE 35 ===
+MARKETPLACE TRUST
+Verified Reviews &
+Reputation
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Verified reviews only
+REV-001 Only a verified resident stay may create a review.
+REV-002 A resident becomes eligible after at least 30 days of stay. Eligibility remains after checkout.
+REV-003 One verified stay produces one main review; duplicate spam reviews are not allowed.
+REV-004 Rating categories include Cleanliness, Security, Food, Staff Behavior, Wi-Fi, Facilities, Location, Value for Money and
+Overall.
+REV-005 Hostel management may reply publicly but may not edit or delete customer reviews.
+REV-006 Platform moderation may remove/hide reviews only for policy violations, not simply because the review is negative.
+Customer-facing trust
+Reviews should show a Verified Stay marker where
+applicable.
+Marketplace quality
+Ratings can contribute to organic ranking alongside
+distance, availability, completeness and response
+performance.
+Detailed implementation rules
+Review edit policy. Any review-edit window should preserve edit
+timestamps/history sufficient for moderation; hostel management
+cannot rewrite customer text.
+Review report. Users/hostels may report reviews for policy reasons;
+Content Moderator decides content-policy action, not financial truth
+disputes.
+Eligibility check. Review submission API validates verified-stay
+duration and one-review-per-stay rule server-side.
+Rating aggregation. Overall hostel rating should exclude hidden/
+removed invalid reviews according to moderation state while keeping
+audit history.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 35 of 50
+=== PAGE 36 ===
+MANAGEMENT UX
+Owner Dashboard & Cross-Branch
+Control
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Owner dashboard
+120TOTAL SEATS
+93OCCUPIED
+17AVAILABLE
+77.5%OCCUPANCY
+OWN-001 Owner dashboard shall show total/occupied/available/reserved/maintenance seats, occupancy %, active residents,
+expected/collected/outstanding rent, pending bookings, payment proofs, complaints, upcoming checkouts and subscription
+status.
+OWN-002 Owner with multiple branches may select All Branches or drill into one branch.
+OWN-003 Actions Required shall surface unverified payments, overdue rent, pending bookings, unresolved complaints, checkouts and
+subscription warnings.
+OWN-004 Owner may export owned hostel data including residents, bookings, payments, invoices, assignments and deposit records.
+Goal. Owner should understand “what needs attention today?” within seconds of opening
+the management dashboard.
+Detailed implementation rules
+Branch filter. All-Branches metrics must allow drill-down to the source
+branch and preserve each branch’s currency/pricing assumptions.
+Action counts. Pending payment/booking/complaint counts should be
+actionable links, not decorative numbers.
+Expired branch. Combined dashboard clearly flags read-only/expired
+branches and avoids presenting their stale availability as live.
+Export ownership. Owner exports are limited to owned organizations/
+branches and do not include platform-admin-only moderation data.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 36 of 50
+=== PAGE 37 ===
+MANAGEMENT UX
+Branch Manager Dashboard & Daily
+Operations
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Manager dashboard - assigned branch only
+Today
+Check-ins, checkouts and visit
+schedule.
+Action queue
+Bookings, payment proofs and
+unresolved complaints.
+Live operations
+Vacant seats, overdue rent and
+unread customer chat.
+MGRD-001 Manager dashboard shall not show another branch, another branch resident or owner-wide subscription/financial
+information.
+MGRD-002 Manager may approve/reject booking requests for assigned branch.
+MGRD-003 Manager may approve/reject rent payment proofs for assigned branch.
+MGRD-004 Manager may check in/out residents, manage seats/rooms, menu, transport and complaints within assigned authority.
+MGRD-005 Manager cannot appoint/fire another Manager, alter ownership or change branch assignment.
+Desktop-first processing
+High-volume screens such as Payment Verification should use split views: queue on the left, selected proof/details/actions on the
+right, minimizing repetitive navigation.
+Detailed implementation rules
+Queue ordering. Manager action queues should prioritize urgent/old
+items such as expiring bookings, overdue proof review and unresolved
+complaints.
+Check-in rule. Only Owner or assigned Manager can mark check-in
+for the branch, which activates ResidentStay and Occupied seat state.
+No cross-branch search leak. Management global search for a
+Manager must be scoped to assigned branch before matching
+residents, rooms or payments.
+Session behavior. If Owner fires the Manager during an active
+session, protected management calls fail immediately and session is
+redirected out of branch management.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 37 of 50
+=== PAGE 38 ===
+MANAGEMENT UX
+Management Information
+Architecture
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Recommended management navigation
+Dashboard
+Summary + action queue
+Bookings
+Requests + approvals
+Bed Board
+Who lives where
+Residents
+Identity + stay history
+Rent Board
+Who paid this month
+Payments
+Proof + transaction history
+Visits
+Scheduled hostel visits
+Complaints
+Open to closure
+Mess & Menu
+Weekly food plan
+Transport
+Routes + subscribers
+Reviews
+Feedback + replies
+Reports
+Exports + trends
+Hostel Profile
+Marketplace data
+Rooms & Seats
+Structure + photos
+Subscription
+Trial / renewal
+Separation principle. Bed Board = occupancy; Rent Board = payment state; Residents =
+identity/stay record. Do not collapse these into one overloaded screen.
+Detailed implementation rules
+Quick actions. Management home should expose Add Walk-In
+Resident, Review Payment, View Available Seats, New Booking and
+Send Rent Reminders where authorized.
+Navigation permission. Modules without permission should not be
+shown, but backend denial remains required if a hidden route is
+requested directly.
+Context retention. Branch context should persist while moving
+between Bed Board, Residents, Rent Board and Payments to avoid
+accidental operations in the wrong branch.
+Search. Desktop management should support fast resident/room/seat
+lookup within authorized branch scope.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 38 of 50
+=== PAGE 39 ===
+ANALYTICS
+Reports, Marketplace Metrics &
+Performance Warnings
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+MVP reports
+Occupancy Residents Bookings Rent Collection Outstanding Dues Payment History Security Deposits
+Checkout History Complaints Transport Subscribers
+Common filters
+Date Range Branch Building Floor Room Resident Status
+RPT-001 Relevant reports shall export to CSV and PDF.
+RPT-002 Full P&L/accounting is outside MVP; rent reporting shall still show expected vs collected vs outstanding.
+RPT-003 Marketplace/operations analytics should track booking conversion, manager response times, expired requests, setup
+completion, rent usage and trial-to-paid retention.
+RPT-004 Owner performance warnings may flag repeated expired booking requests or slow response behavior that harms
+marketplace reliability.
+Marketplace metrics
+Searches → listing views → chat/visit → booking →
+approval → confirmed → check-in.
+Management metrics
+Setup completion, active managers, occupancy freshness,
+rent tracking use and branch renewal.
+Detailed implementation rules
+Report consistency. Reports use the same authoritative domain
+records as operational screens; separate spreadsheet-like counters
+must not drift from system truth.
+PDF/CSV security. Exports containing resident or financial data
+require authorization and should use controlled download URLs/expiry
+where practical.
+Response metrics. Booking response time is measured from request
+submission to first Manager/Owner decision event.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 39 of 50
+=== PAGE 40 ===
+COMMERCIAL OPERATIONS
+Subscription, Trial & Branch Read-Only
+State
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Branch subscription states
+Trial Active Expiring Expired / Read-only Complimentary
+SUB-001 Every approved branch begins a three-month free trial from approval date.
+SUB-002 Main branch renews at PKR 5,000/month; each additional branch at PKR 3,500/month under the current business model.
+SUB-003 On expiry, only that branch becomes read-only; other active branches remain operational.
+SUB-004 Expired branch may view/export historical data but cannot create new operational transactions until renewal.
+SUB-005 Public listing may remain visible after expiry, but exact live availability must be replaced by “Availability confirmation required”
+or equivalent stale-state messaging.
+SUB-006 Root Admin may extend or grant complimentary periods with reason and explicit expiry; actions are audited.
+Trial / renewal reminders
+30 days 14 days 7 days 3 days 1 day
+Detailed implementation rules
+Read-only enforcement. Expired branch read-only state is backend-
+enforced for mutations; it is not merely a disabled button style.
+Renewal recovery. After confirmed renewal, write access and live
+availability synchronization resume without recreating branch data.
+Trial reminders. Reminder schedule is configurable by Platform
+policy; missing a reminder does not extend the subscription
+automatically.
+Historical terms. Already-paid subscription period retains its original
+price even if Root Admin changes future prices.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 40 of 50
+=== PAGE 41 ===
+PLATFORM ADMIN
+Platform Administration
+Hierarchy
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Root Admin
+Maximum 3, minimum 1. Full platform authority. Last Root
+Admin cannot be removed.
+Normal Admin Roles
+Verification Admin · Subscription/Billing Admin · Support
+Admin · Content Moderator.
+ADM-001 Normal admins cannot create, remove, promote or otherwise modify Root Admin authority.
+ADM-002 Root Admin access is authenticated account + role based; phone number alone shall never grant Root Admin authorization.
+ADM-003 Normal admins may hold multiple allowed roles, but there is no normal-admin “all access” role.
+ADM-004 Normal admin states include Invited, Active, Suspended and Deactivated; historic actions remain auditable.
+ADM-005 No customer/hostel account impersonation feature shall exist in MVP.
+ADM-006 Critical Root Admin step-up MFA is architecture-ready but may be added after MVP.
+Detailed implementation rules
+Root cap. Attempt to create a fourth Root Admin is rejected until an
+existing Root Admin is legitimately removed while preserving
+minimum-one rule.
+Normal admin scope. Each normal-admin action is checked against
+assigned admin roles, not just membership in a generic admin table.
+Recovery. Root Admin recovery is privileged/manual and cannot be
+completed by ordinary Support Admin.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 41 of 50
+=== PAGE 42 ===
+PLATFORM ADMIN
+Platform Verification, Moderation &
+Support
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Platform operational powers
+Area Allowed actions
+Hostel verification Review, request changes, approve, reject, suspend/unpublish
+Content Reject misleading/fake/poor photos; request replacements
+Customer accounts Warn/suspend/ban for platform abuse, fraud, harassment, spam or policy violations
+Reports Investigate fake listing, wrong price, unsafe condition, harassment, scam/fraud, inappropriate chat, spam
+Support Respond to Help & Support tickets
+Financial disputes No final arbitration between hostel and resident
+ADM-007 Serious fraud/safety reports may temporarily hide a public listing while leaving internal hostel data intact.
+ADM-008 Platform Admin shall not directly edit hostel room inventory, rent or security deposit; request correction or enforce listing state
+instead.
+ADM-009 Support ticket priorities: Normal, High, Critical; statuses: Open, In Progress, Waiting for User, Resolved, Closed.
+ADM-010 Announcements may target all managers, selected hostels, customers or city groups and may be scheduled.
+Detailed implementation rules
+Moderation evidence. Suspension/rejection action stores reason,
+actor, timestamps and relevant report/evidence references.
+No data mutation. Platform staff correct marketplace trust by
+requesting owner changes or changing listing state, not by secretly
+rewriting rent or room inventory.
+Support separation. Help & Support tickets are platform-user
+support; resident complaints remain resident-hostel operational
+records.
+Financial boundary. Platform may retain communication/proof
+evidence but does not decide security-deposit or cancellation refund
+entitlement in MVP.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 42 of 50
+=== PAGE 43 ===
+CROSS-CUTTING
+Notifications & Communication
+Events
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Customer / resident notifications
+Booking submitted Approved / Rejected Expiry warning Payment proof state Visit state Chat Waitlist availability
+Rent due / overdue Receipt Complaint update Checkout / refund Support reply
+Owner / Manager notifications
+New booking Payment proof Visit request New chat Checkout request Complaint / reopen Review
+Subscription expiry Support reply Platform announcement
+NTF-001 Primary channels are in-app and email; SMS/WhatsApp may be used where integration/provider is configured.
+NTF-002 Transactional/security notifications cannot be fully disabled; promotional notifications must be optional.
+NTF-003 Notifications must be scoped to the correct branch/customer and must not leak another branch’s resident or financial
+information.
+Detailed implementation rules
+Preference categories. Users may opt out of marketing/promotional
+messages, while essential booking, rent, security and account
+notifications remain enabled.
+Deduplication. A single domain event should not create repeated
+duplicate in-app notifications due to retry processing.
+Deep links. Notification links must resolve only to resources the
+recipient is authorized to access.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 43 of 50
+=== PAGE 44 ===
+SECURITY
+Security, Authentication & Branch
+Isolation
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Security baseline
+Secure password hashing
+OTP verification for required signup steps
+Rate limiting and lockouts
+Session revocation
+Server-side RBAC
+Branch/resource ownership checks
+CSRF/XSS/SQL injection defenses
+TLS in transit
+Sensitive-data encryption where appropriate
+Secrets server-side only
+Secure file-type/size validation
+No public URLs for sensitive identity documents
+Backup + restore testing
+Privacy-by-design / data minimization
+SEC-001 UI visibility is never authorization. Every privileged API action validates user, role, branch scope, resource ownership and
+account state.
+SEC-002 Manager 24-hour temporary credentials shall be single-use, securely hashed and protected by rate limits.
+SEC-003 CNIC, permanent address, guardian data, payment proofs and private chat are sensitive data and access must follow least
+privilege.
+SEC-004 Location permission is contextual; no continuous background tracking is required.
+Critical. A Manager who knows or guesses another branch identifier must still receive a
+backend authorization denial.
+Detailed implementation rules
+Password storage. Permanent and temporary passwords are never
+stored in plaintext. Use a modern adaptive password hash and secure
+reset/recovery flow.
+File uploads. Validate MIME/type, size and extension; sanitize
+filenames; store sensitive documents outside public static paths.
+Session security. Support logout/revocation and rotate/invalidate
+sessions after sensitive account changes such as Manager
+deactivation or password reset.
+Abuse controls. Login, OTP, proof upload and support/report
+endpoints require rate/size limits appropriate to abuse risk.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 44 of 50
+=== PAGE 45 ===
+SECURITY
+Privacy, Audit Logs & Data
+Retention
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Auditability
+AUD-001 Platform admin audit logs are append-only from the application UI and cannot normally be deleted by admins.
+AUD-002 Hostel audit logs record payment approvals/rejections, rent changes, booking decisions, resident transfers, check-in/out and
+important access changes.
+AUD-003 Historic records preserve actor identity even after Manager deactivation or room/branch archival.
+AUD-004 Residents, bookings, payments, invoices, rooms, seats, verification records and admin actions are archived rather than
+destructively deleted when historically referenced.
+Privacy boundaries
+Data Marketplace Owner / Manager Platform
+Resident identity Never public Owner + assigned Manager Restricted / Root when justified
+Rent payment state Never public Internal Rent Board Aggregate/authorized support only
+CNIC / permanent address Never public Authorized operational access Highly restricted
+Private chat Participants Branch participants Only reported/safety cases
+Seat availability Available/occupied only Full occupancy mapping Aggregate/verification as needed
+Detailed implementation rules
+Retention policy. Operational retention periods should be defined
+before production launch in consultation with legal/business
+requirements; deletion routines must respect accounting/audit
+dependencies.
+User deletion. Account deletion/deactivation must separate user-
+facing account removal from legally/operationally retained transaction
+history.
+Access logs. Highly sensitive document access should be logged
+where feasible so misuse can be investigated.
+Data export. Owner/customer exports include only their authorized
+data and never internal Platform security metadata.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 45 of 50
+=== PAGE 46 ===
+ARCHITECTURE
+Logical Data Model I - Identity, Branch &
+Property
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Core domain entities - identity, geography, property
+Domain Entities / records
+Identity User, CustomerProfile, OwnerProfile, ManagerAssignment, Role, Permission, Session, VerificationRecord
+Geography City, Area/Sector, SubArea, University, Workplace/BusinessHub, GeoLocation
+Commercial ownership OwnerOrganization, HostelBrand, Branch, BranchSubscription
+Property Building, Floor, Room, RoomType, Seat/Bed
+Listing content HostelPhoto, RoomPhoto, SeatPhoto, Amenity, RoomAmenity, HostelRule, VisitingSchedule, CancellationPolicy
+Platform verification HostelVerification, VerificationDocument, VerificationStatusHistory
+Important relationships
+Owner 1..* Brand/Hostel Brand/Hostel 1..* Branch Branch 1..* Building -> Floor -> Room -> Seat ManagerAssignment =
+User + exactly one Branch (MVP) Seat has at most one active BedAssignment Customer has at most one Active
+ResidentStay (MVP)
+Data-model rule. The schema must not assume a single hostel per Owner because the
+product explicitly supports multiple brands and branches.
+Detailed implementation rules
+Keys. Use immutable internal IDs for users, branches, rooms, seats,
+bookings, stays, invoices and payments; display codes may change
+independently.
+Uniqueness. Enforce normalized unique CNIC/verified contact
+constraints according to identity policy and unique active seat
+assignment constraints.
+Soft-delete state. Archived/inactive flags must be modeled explicitly
+where historical foreign keys depend on records.
+Coordinates. Store normalized latitude/longitude on branch and
+reference points for efficient distance queries.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 46 of 50
+=== PAGE 47 ===
+ARCHITECTURE
+Logical Data Model II & Key Business
+Rules
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Core domain entities - booking, resident, finance, operations
+Domain Entities / records
+Booking BookingRequest, BookingStatusHistory, SeatReservation, VisitRequest, WaitingListEntry
+Resident ResidentStay, BedAssignment, BedTransfer, Guardian, EmergencyContact, ResidentDocument,
+AgreementAcceptance
+Finance Invoice, InvoiceItem, Payment, PaymentProof, Receipt, SecurityDeposit, SecurityDeduction, Discount, LateFee,
+AdvanceBalance
+Services WeeklyMenu, MealItem, TransportService, Route, Stop, ResidentTransportSubscription
+Communication Conversation, ChatMessage, Attachment, Notification, Announcement
+Complaints / reviews Complaint, ComplaintStatusHistory, Review, ReviewRating, ReviewReply, Report
+Platform SupportTicket, SubscriptionPayment, SubscriptionExtension, PlatformAuditLog, HostelAuditLog
+Non-negotiable business rules
+BR-01 Customers are free; no booking commission or platform-held rent wallet in MVP.
+BR-02 Main branch PKR 5,000/month; additional branch PKR 3,500/month after each branch’s three-month trial.
+BR-03 One customer has one Active Hostel at a time.
+BR-04 One Manager is assigned to one branch in MVP.
+BR-05 Public seat view never exposes occupant identity or rent-payment state.
+Detailed implementation rules
+Status history. Booking, complaint, verification and subscription state
+transitions require history records where audit/reconstruction matters.
+Transaction boundaries. Payment approval, check-in, checkout and
+transfer are multi-record operations and should commit atomically.
+Money precision. Store PKR monetary values in integer minor units
+or fixed precision; never binary floating point.
+Time. Store timestamps consistently with timezone-aware backend
+semantics and display in Pakistan/local context as appropriate.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 47 of 50
+=== PAGE 48 ===
+WORKFLOWS
+End-to-End Workflow
+Summary
+SRS v2.0
+Islamabad & Rawalpindi
+MVP Baseline
+Customer booking to active stay
+Search → Seat / Photo → Request → Approve → Confirm per
+policy → Check In
+Monthly rent
+Invoice → Pay Hostel → Upload Proof → Owner/Manager
+Review → Green + Receipt
+Manager appointment
+Owner Appoints → 24h Temp Password → Mobile + Temp → Set Permanent
+Password → Assigned Branch
+Only
+Complaint
+Open → In Progress → Resolved → Resident Accepts / Reopen
+Detailed implementation rules
+Failure behavior. If an external notification fails, the booking/payment
+state remains committed; notification retry is separate from domain
+transaction success.
+Booking concurrency. The final confirmation/check-in path
+revalidates seat state even if the customer previously viewed it as
+Available.
+Payment flow. Payment verification never assumes proof equals
+settlement; explicit Owner/Manager approval creates the Paid state in
+MVP.
+Complaint flow. Reopen returns the complaint to an actionable state
+while preserving the prior resolution attempt in history.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 48 of 50
+=== PAGE 49 ===
+PERMISSIONS
+Permissions Matrix & Authorization
+Summary
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+Core permissions matrix
+Capability Customer / Resident Owner Branch Manager Platform Admin
+Browse marketplace Yes Yes Yes Yes
+Book / visit / chat Yes As customer if applicable As customer if applicable No operational booking
+View resident-to-seat identity Own stay only All owned branches Assigned branch only Restricted
+Create rooms/seats No Yes Assigned branch No direct edit
+Approve bookings No Yes Assigned branch No
+Verify resident rent No Yes Assigned branch No
+View combined branches No Yes No Aggregate/admin views
+Appoint/fire Manager No Yes No No
+Approve hostel listing No No No Authorized admin
+Manage branch subscription No Owner view/payment No Billing/Root controls
+Raise complaint Active resident Can view/manage Can view/manage Not resident-hostel arbiter
+View sensitive CNIC/docs Own data Authorized Assigned branch
+authorized
+Root/restricted need-based
+Permission enforcement. Every row above is an API authorization requirement, not just a
+screen-visibility preference.
+Detailed implementation rules
+Default deny. Any capability not explicitly granted to a role/resource
+scope is denied by default.
+Owner scope. Owner authority is limited to owned hostel
+organizations/branches and does not grant Platform Admin capability.
+Platform scope. Platform moderation/admin authority does not grant
+resident rent approval or hostel operational ownership.
+Customer scope. Customer can access only own bookings, stays,
+payments, complaints and private conversations plus public
+marketplace data.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 49 of 50
+=== PAGE 50 ===
+MVP EXIT
+Acceptance Criteria, Quality Gates & Next
+Deliverables
+SRS v2.0
+Islamabad &
+Rawalpindi
+MVP Baseline
+MVP EXIT GATE
+Acceptance Criteria & Development
+Baseline
+The MVP is complete only when customer discovery, branch operations, active stay, rent
+verification and platform verification work end-to-end without cross-branch data leakage or financial
+state inconsistency.
+Customer acceptance
+Search + filters
+Seat and mandatory photos
+Booking / visit / chat
+Upcoming → Active Hostel
+Pay Rent + proof
+Receipt, complaints, checkout,
+review
+Management acceptance
+Owner multi-branch access
+Manager single-branch access
+Rooms/seats + Bed Board
+Booking approval
+Rent Board + proof approval
+Resident / complaint /
+checkout flows
+Platform acceptance
+Hostel verification
+Root/normal admin separation
+Branch subscriptions
+Moderation/support
+Master location data
+Audit logs and security
+controls
+Quality gates
+ACC-001 No double-booked active seat under concurrent booking/check-in actions.
+ACC-002 No Branch Manager can access another branch by UI manipulation, URL modification or direct API request.
+ACC-003 No customer can view another resident’s identity, rent state or Active Hostel data.
+ACC-004 Every green Paid rent state has a linked approved payment record and generated receipt.
+ACC-005 Expired branch subscriptions become read-only without impacting other active branches.
+ACC-006 All critical privileged actions leave an auditable history.
+Next technical deliverables. ERD/database schema → API contract → detailed
+wireframes/design system → implementation phases → QA test suite → deployment
+architecture.
+Detailed implementation rules
+Performance acceptance. Common marketplace search and
+management board actions should meet defined production response
+targets under expected launch load; exact SLO values are set during
+architecture/performance planning.
+Backup acceptance. A restore procedure must be tested before
+production go-live, not merely configured.
+Accessibility acceptance. Primary web flows use semantic labels,
+keyboard-accessible controls, sufficient contrast and status labels not
+dependent on color alone.
+Release gate. Critical authorization, double-booking or payment-state
+integrity defects block launch regardless of visual completion.
+Twin Cities Hostel Marketplace & Management System - SRS v2.0 Page 50 of 50
