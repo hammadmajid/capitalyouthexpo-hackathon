@@ -1,0 +1,22 @@
+{
+  "name": "@hsm/config",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./tsconfig": "./tsconfig.json",
+    "./eslint": "./eslint.mjs",
+    "./prettier": "./prettier.mjs"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "test": "vitest run --coverage",
+    "security:audit": "node scripts/security-audit.ts",
+    "coverage:produce": "node scripts/coverage-producer.ts",
+    "coverage:aggregate": "node scripts/coverage-aggregate.ts"
+  },
+  "devDependencies": {
+    "zod": "catalog:"
+  }
+}
