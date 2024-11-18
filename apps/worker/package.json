@@ -1,0 +1,37 @@
+{
+  "name": "@hsm/worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=../../.env.worker --watch dist/main.js",
+    "start": "node --env-file-if-exists=../../.env.worker dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "lint": "eslint src test *.ts",
+    "test": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "coverage:unit": "vitest run --config vitest.aggregate.config.ts",
+    "coverage:integration": "vitest run --config vitest.aggregate.integration.config.ts",
+    "test:visits": "vitest run --coverage src/runtime.spec.ts"
+  },
+  "dependencies": {
+    "@hsm/contracts": "workspace:*",
+    "@hsm/db": "workspace:*",
+    "@hsm/emails": "workspace:*",
+    "@hsm/files": "workspace:*",
+    "@hsm/notifications": "workspace:*",
+    "@hsm/security": "workspace:*",
+    "bullmq": "6.7.8",
+    "drizzle-orm": "catalog:",
+    "ioredis": "catalog:",
+    "nodemailer": "10.6.0",
+    "pino": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@hsm/config": "workspace:*",
+    "@types/nodemailer": "8.0.2",
+    "testcontainers": "catalog:"
+  }
+}
