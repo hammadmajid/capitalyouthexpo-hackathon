@@ -1,0 +1,23 @@
+{
+  "name": "@hsm/test-support",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/fixture.js"
+  },
+  "types": "./dist/fixture.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@hsm/db": "workspace:*",
+    "@hsm/security": "workspace:*",
+    "@hsm/files": "workspace:*",
+    "@aws-sdk/client-s3": "catalog:",
+    "drizzle-orm": "catalog:",
+    "testcontainers": "catalog:"
+  }
+}
