@@ -1,0 +1,1 @@
+CREATE INDEX "hostel_audit_gallery_version_idx" ON "hostel_audit_log" USING btree ("branch_id","target_id",("before"->>'version')) WHERE "hostel_audit_log"."target_type" = 'listing_media' and "hostel_audit_log"."action" = 'listing.image.changed' and "hostel_audit_log"."before"->>'publishedAt' is not null;
