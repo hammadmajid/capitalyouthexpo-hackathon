@@ -1,0 +1,2 @@
+ALTER TABLE "inventory_claims" DROP CONSTRAINT "inventory_claims_range_check";--> statement-breakpoint
+ALTER TABLE "inventory_claims" ADD CONSTRAINT "inventory_claims_range_check" CHECK (CASE WHEN "inventory_claims"."move_out_date" is null THEN "inventory_claims"."assignment_id" is not null ELSE "inventory_claims"."move_in_date" < "inventory_claims"."move_out_date" END);
