@@ -1,0 +1,1 @@
+ALTER TYPE "public"."notification_channel_enum" ADD VALUE 'internal';
