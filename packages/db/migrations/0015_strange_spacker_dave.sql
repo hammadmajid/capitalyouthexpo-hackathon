@@ -1,0 +1,1 @@
+CREATE INDEX "listing_media_public_order_idx" ON "listing_media" USING btree ("branch_id","sort_order","id") WHERE "listing_media"."archived_at" is null and "listing_media"."published_at" is not null;

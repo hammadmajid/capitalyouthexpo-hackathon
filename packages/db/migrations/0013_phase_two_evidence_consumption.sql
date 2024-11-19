@@ -1,0 +1,2 @@
+ALTER TABLE "booking_documents" ADD COLUMN "consumed_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "booking_documents" ADD CONSTRAINT "booking_documents_consumption_check" CHECK ("booking_documents"."consumed_at" is null or ("booking_documents"."booking_id" is null and "booking_documents"."state" <> 'rejected'));

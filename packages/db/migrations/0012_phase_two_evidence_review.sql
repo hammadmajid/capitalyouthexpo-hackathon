@@ -1,0 +1,2 @@
+ALTER TABLE "booking_documents" ALTER COLUMN "booking_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "booking_documents" ADD CONSTRAINT "booking_documents_branch_id_branches_id_fk" FOREIGN KEY ("branch_id") REFERENCES "public"."branches"("id") ON DELETE no action ON UPDATE no action;
