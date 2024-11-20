@@ -1,0 +1,2 @@
+ALTER TABLE "bed_prices" ADD COLUMN "deposit_paisa" bigint;--> statement-breakpoint
+ALTER TABLE "bed_prices" ADD CONSTRAINT "bed_prices_deposit_check" CHECK ("bed_prices"."deposit_paisa" is null or "bed_prices"."deposit_paisa" between 0 and 9007199254740991);
