@@ -1,0 +1,7 @@
+ALTER TABLE "listing_media" ADD COLUMN "room_id" uuid;--> statement-breakpoint
+ALTER TABLE "listing_media" ADD COLUMN "seat_id" uuid;--> statement-breakpoint
+ALTER TABLE "listing_media" ADD CONSTRAINT "listing_media_branch_id_room_id_rooms_branch_id_id_fk" FOREIGN KEY ("branch_id","room_id") REFERENCES "public"."rooms"("branch_id","id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "listing_media" ADD CONSTRAINT "listing_media_branch_id_room_id_seat_id_seats_branch_id_room_id_id_fk" FOREIGN KEY ("branch_id","room_id","seat_id") REFERENCES "public"."seats"("branch_id","room_id","id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "listing_media_room_idx" ON "listing_media" USING btree ("room_id") WHERE "listing_media"."archived_at" is null and "listing_media"."published_at" is not null;--> statement-breakpoint
+CREATE INDEX "listing_media_seat_idx" ON "listing_media" USING btree ("seat_id") WHERE "listing_media"."archived_at" is null and "listing_media"."published_at" is not null;--> statement-breakpoint
+ALTER TABLE "listing_media" ADD CONSTRAINT "listing_media_target_check" CHECK ("listing_media"."seat_id" is null or "listing_media"."room_id" is not null);
