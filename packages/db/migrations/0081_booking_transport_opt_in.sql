@@ -1,0 +1,2 @@
+ALTER TABLE "booking_upfront_terms" DROP CONSTRAINT "booking_upfront_terms_amount_check";--> statement-breakpoint
+ALTER TABLE "booking_upfront_terms" ADD CONSTRAINT "booking_upfront_terms_amount_check" CHECK ("booking_upfront_terms"."amount_paisa" between 1 and 9007199254740991);

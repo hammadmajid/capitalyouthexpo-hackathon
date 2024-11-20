@@ -1,0 +1,4 @@
+ALTER TABLE "resident_payment_proofs" ALTER COLUMN "invoice_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "resident_payment_proofs" ADD COLUMN "deposit_paisa" bigint DEFAULT 0 NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "resident_payment_proofs_pending_security_uq" ON "resident_payment_proofs" USING btree ("stay_id") WHERE "resident_payment_proofs"."state" = 'submitted' and "resident_payment_proofs"."deposit_paisa" > 0;--> statement-breakpoint
+ALTER TABLE "resident_payment_proofs" ADD CONSTRAINT "resident_payment_proofs_security_check" CHECK ("resident_payment_proofs"."deposit_paisa" between 0 and "resident_payment_proofs"."amount_paisa" and ("resident_payment_proofs"."invoice_id" is not null or "resident_payment_proofs"."deposit_paisa" > 0));
