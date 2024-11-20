@@ -1,0 +1,629 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791357688702,
+      "tag": "0000_extensions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791358536830,
+      "tag": "0001_phase_one_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791358599566,
+      "tag": "0002_database_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791401460969,
+      "tag": "0003_petite_forgotten_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791458620266,
+      "tag": "0004_wonderful_lady_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791631737516,
+      "tag": "0005_worried_wrecking_crew",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791649731744,
+      "tag": "0006_third_tomas",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791929739221,
+      "tag": "0007_phase_two_inventory",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791929809513,
+      "tag": "0008_phase_two_commercial",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791929859651,
+      "tag": "0009_phase_two_inventory_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791931817343,
+      "tag": "0010_phase_two_hold_lineage",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791932353905,
+      "tag": "0011_phase_two_public_directory",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791933225407,
+      "tag": "0012_phase_two_evidence_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792062509047,
+      "tag": "0013_phase_two_evidence_consumption",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792062572137,
+      "tag": "0014_phase_two_evidence_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792220691078,
+      "tag": "0015_strange_spacker_dave",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792231875181,
+      "tag": "0016_lethal_hairball",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792243430725,
+      "tag": "0017_gigantic_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792322267716,
+      "tag": "0018_quick_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792322331108,
+      "tag": "0019_stay_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792326041473,
+      "tag": "0020_heavy_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792326052363,
+      "tag": "0021_finance_source_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792326063298,
+      "tag": "0022_finance_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792326556308,
+      "tag": "0023_workable_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792342247771,
+      "tag": "0024_stay_agreement_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792343150443,
+      "tag": "0025_fuzzy_the_captain",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792343207889,
+      "tag": "0026_giant_slyde",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792343221703,
+      "tag": "0027_stay_inventory_lineage",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792348918092,
+      "tag": "0028_little_the_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792458060028,
+      "tag": "0029_resident_billing_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792458332363,
+      "tag": "0030_resident_billing_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792489394401,
+      "tag": "0031_resident_billing_origins",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792489472472,
+      "tag": "0032_resident_billing_origin_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792491899379,
+      "tag": "0033_guarded_system_posting",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792494400050,
+      "tag": "0034_billing_origin_item_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1792626770184,
+      "tag": "0035_visit_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792626970205,
+      "tag": "0036_visit_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792663862537,
+      "tag": "0037_visit_interest",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1792663904251,
+      "tag": "0038_visit_interest_history_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1792691788700,
+      "tag": "0039_revised_phase1_waitlist",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792789195941,
+      "tag": "0040_stabilize_inventory_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792855701774,
+      "tag": "0041_phase3_chat",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792856195392,
+      "tag": "0042_phase3_chat_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1792860300314,
+      "tag": "0043_phase3_chat_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1792860305063,
+      "tag": "0044_phase3_report_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1792864098955,
+      "tag": "0045_phase3_authority_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792934559563,
+      "tag": "0046_inventory_import_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792934760550,
+      "tag": "0047_inventory_import_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792938710061,
+      "tag": "0048_room_type_prices",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792938741229,
+      "tag": "0049_effective_price_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792944257537,
+      "tag": "0050_listing_media_inventory_targets",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1792944268470,
+      "tag": "0051_listing_media_target_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792949756830,
+      "tag": "0052_booking_upfront_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792949762274,
+      "tag": "0053_booking_upfront_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1793020292583,
+      "tag": "0054_phase7_resident_payment_proofs",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1793025364319,
+      "tag": "0055_phase8_stay_final_statements",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1793037767204,
+      "tag": "0056_phase9_billing_continuation",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1793040481542,
+      "tag": "0057_phase9_resident_services",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1793044865897,
+      "tag": "0058_phase10_platform_admin",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1793155864804,
+      "tag": "0059_report_property_structure",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1793236472879,
+      "tag": "0060_owner_setup_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1793246121209,
+      "tag": "0061_room_amenities",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1793344626715,
+      "tag": "0062_safe_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1793372955541,
+      "tag": "0063_common_squadron_supreme",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1793486181071,
+      "tag": "0064_owner_cnic_photos_optional",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1793571604771,
+      "tag": "0065_third_colleen_wing",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1793573544003,
+      "tag": "0066_closed_black_crow",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1793573689974,
+      "tag": "0067_agreement_acceptance_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1793601746965,
+      "tag": "0068_sad_bug",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1793601767452,
+      "tag": "0069_agreement_file_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1794676746331,
+      "tag": "0070_place_categories",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1794692765143,
+      "tag": "0071_menu_meal_times",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1794695822406,
+      "tag": "0072_staff_and_salaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1794754110931,
+      "tag": "0073_hostel_revisions",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1794759269305,
+      "tag": "0074_transport_routes_trips",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1794766930309,
+      "tag": "0075_transport_single_subscription",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1794837954397,
+      "tag": "0076_transport_billing_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1794947798010,
+      "tag": "0077_proof_covers_several_bills",
+      "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1794954468991,
+      "tag": "0078_resident_account_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1794987052038,
+      "tag": "0079_resident_cnic",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1794997783299,
+      "tag": "0080_security_payment_allocations",
+      "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1794999092040,
+      "tag": "0081_booking_transport_opt_in",
+      "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1795199867761,
+      "tag": "0082_individual_bed_prices",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1795200118904,
+      "tag": "0083_bed_price_history_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1795248911952,
+      "tag": "0084_bed_count_rooms",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1795248984219,
+      "tag": "0085_automatic_room_capacity",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1795264385336,
+      "tag": "0086_bed_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1795283887232,
+      "tag": "0087_resident_cnic_photo",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1795331613387,
+      "tag": "0088_combined_invoice_origins",
+      "breakpoints": true
+    }
+  ]
+}
