@@ -1,0 +1,14 @@
+{
+  "forge": {
+    "patch": "b678fa5b80e177badd1800c9ac1af0b9d56249f38c396b80c4d188758185dd8c",
+    "rsa": "40d7834d145eb7acaa773c9ad0a8895eb1805f5fdee3b668763c0f8bf67266c0"
+  },
+  "braces": {
+    "patch": "074019fc3853d36c9169938223e790264cbbbb6798536de7d78e7f74e3a13cf4",
+    "compile": "f6a558ae7075978137c785629a6fd9cb9387c8c08c6a5ba5254a36dab4f8ca9d",
+    "expand": "04bf22159886a7d08c5c1fc5458a11ca95e5d92785d2857b65319ac7e2b27648",
+    "parse": "63924f22593f1d36abb14aeffdd1ca804fb6ee0b35e74ab931e0e2dca65e0327",
+    "stringify": "af13e9f4f8fb0ec35ef42cdd5a1bceb8ce239edfe5e5208adc0a1eee7680fb15",
+    "utils": "a59bc307c89b5d761d1a1cdb1437e45b789d6a51adea7d68aba51cf716613d5f"
+  }
+}
