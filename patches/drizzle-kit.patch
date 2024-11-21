@@ -1,0 +1,12 @@
+diff --git a/bin.cjs b/bin.cjs
+index c28f3e4732f0d911237dc1eb1bc466cefaa1b976..7099f33f3b5b899913735ee0bd9993ce38ed044c 100644
+--- a/bin.cjs
++++ b/bin.cjs
+@@ -22922,6 +22922,7 @@ var init_sqlgenerator = __esm({
+         "char",
+         "vector",
+         "geometry",
++        "geography",
+         "halfvec",
+         "sparsevec",
+         "bit"
