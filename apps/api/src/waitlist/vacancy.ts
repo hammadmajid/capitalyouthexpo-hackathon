@@ -54,3 +54,59 @@ export async function saveExpectedVacancy(
     throw new DomainError(
       'CONFLICT',
       409,
+      "Vacancy dates now come from residents' departure notices and cannot be typed in",
+    );
+  const before = await readExpectedVacancy(tx, branchId, roomTypeId),
+    now = clock();
+  if (before.version !== input.expectedVersion)
+    throw new DomainError(
+      'PRECONDITION_FAILED',
+      412,
+      'Vacancy estimate changed; reload before saving',
+    );
+  if (
+    input.expectedVacancyDate !== null &&
+    (await hasOperationalInventoryAvailability(
+      tx,
+      branchId,
+      waitlistTodayRange(now),
+      now,
+      roomTypeId,
+    ))
+  )
+    throw new DomainError(
+      'CONFLICT',
+      409,
+      'Publish an expected vacancy only for a currently full room type',
+    );
+  const updatedAt = new Date(
+    Math.max(now.getTime(), before.version ? Date.parse(before.version) + 1 : now.getTime()),
+  );
+  await tx
+    .insert(expectedVacancies)
+    .values({
+      id: v7(),
+      branchId,
+      roomTypeId,
+      expectedVacancyDate: input.expectedVacancyDate,
+      updatedAt,
+    })
+    .onConflictDoUpdate({
+      target: [expectedVacancies.branchId, expectedVacancies.roomTypeId],
+      set: { expectedVacancyDate: input.expectedVacancyDate, updatedAt },
+    });
+  const after = await readExpectedVacancy(tx, branchId, roomTypeId);
+  await new AuditWriter().hostel(tx, {
+    actorUserId: actor.userId,
+    actorRole: scope.actorRole,
+    organizationId: scope.organizationId,
+    branchId,
+    action: 'waitlist.expected_vacancy.changed',
+    targetType: 'room_type',
+    targetId: roomTypeId,
+    before,
+    after,
+    createdAt: now,
+  });
+  return after;
+}
