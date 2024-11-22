@@ -95,3 +95,100 @@ async function cacheRows(userId: string, key: string) {
 it('PAY-008/SEC-003: concurrent identical HTTP requests commit one mutation, audit and response', async () => {
   const value = await scope(),
     key = randomUUID();
+  const responses = await Promise.all([
+    request(value.access, value.branchA, key),
+    request(value.access, value.branchA, key),
+  ]);
+  expect(responses.map((response) => response.statusCode)).toEqual([200, 200]);
+  expect(responses[0]?.json()).toEqual(responses[1]?.json());
+  expect(responses.map((response) => response.headers['idempotency-replayed']).sort()).toEqual([
+    'false',
+    'true',
+  ]);
+  expect(await auditRows(value.branchA)).toHaveLength(1);
+  expect(await cacheRows(value.ownerId, key)).toHaveLength(1);
+});
+it('PAY-008: a changed body or actual branch conflicts with the same actor-bound key', async () => {
+  const value = await scope(),
+    key = randomUUID();
+  expect((await request(value.access, value.branchA, key)).statusCode).toBe(200);
+  expect((await request(value.access, value.branchA, key, 'Different')).statusCode).toBe(409);
+  expect((await request(value.access, value.branchB, key)).statusCode).toBe(409);
+  expect(await auditRows(value.branchA)).toHaveLength(1);
+  expect(await auditRows(value.branchB)).toHaveLength(0);
+});
+it('PAY-008: another actor has an independent key and cannot replay a foreign branch response', async () => {
+  const first = await scope(),
+    second = await scope(),
+    key = randomUUID();
+  expect((await request(first.access, first.branchA, key)).statusCode).toBe(200);
+  expect((await request(second.access, first.branchA, key)).statusCode).toBe(403);
+  expect((await request(second.access, second.branchA, key, 'Second actor')).json()).toEqual({
+    branchId: second.branchA,
+    name: 'Second actor',
+  });
+  expect(await cacheRows(first.ownerId, key)).toHaveLength(1);
+  expect(await cacheRows(second.ownerId, key)).toHaveLength(1);
+});
+it('PAY-008: expired response entries can execute a new request after 24 hours', async () => {
+  const value = await scope(),
+    key = randomUUID();
+  await request(value.access, value.branchA, key);
+  await fixture.connection.db
+    .update(idempotencyKeys)
+    .set({ createdAt: new Date(now.getTime() - 86400000) })
+    .where(and(eq(idempotencyKeys.userId, value.ownerId), eq(idempotencyKeys.key, key)));
+  const response = await request(value.access, value.branchA, key, 'After expiry');
+  expect(response.statusCode).toBe(200);
+  expect(response.headers['idempotency-replayed']).toBe('false');
+  expect(response.json()).toEqual({ branchId: value.branchA, name: 'After expiry' });
+  expect(await cacheRows(value.ownerId, key)).toHaveLength(1);
+  expect(await auditRows(value.branchA)).toHaveLength(2);
+});
+it.each(['business', 'audit'] as const)(
+  'PAY-008/SEC-003: %s failure rolls back mutation, audit and replay record; retry can succeed',
+  async (kind) => {
+    const value = await scope(),
+      key = randomUUID();
+    repository.failAfterAudit = kind === 'business';
+    repository.invalidAuditActor = kind === 'audit';
+    try {
+      expect((await request(value.access, value.branchA, key)).statusCode).toBe(500);
+    } finally {
+      repository.failAfterAudit = false;
+      repository.invalidAuditActor = false;
+    }
+    const [branch] = await fixture.connection.db
+      .select()
+      .from(branches)
+      .where(eq(branches.id, value.branchA));
+    expect(branch?.name).toBe('Branch A');
+    expect(await auditRows(value.branchA)).toHaveLength(0);
+    expect(await cacheRows(value.ownerId, key)).toHaveLength(0);
+    expect((await request(value.access, value.branchA, key)).statusCode).toBe(200);
+    expect(await auditRows(value.branchA)).toHaveLength(1);
+  },
+);
+it('MGR-004: a revoked manager grant or session cannot replay a previously successful response', async () => {
+  const value = await scope(),
+    key = randomUUID();
+  await fixture.connection.db
+    .update(managerAssignments)
+    .set({
+      status: 'active',
+      activatedAt: now,
+      tempPasswordHash: null,
+      tempPasswordExpiresAt: null,
+    })
+    .where(eq(managerAssignments.id, value.assignmentId));
+  const manager = await fixture.service.issue(value.managerId, 'mobile');
+  expect((await request(manager.accessToken, value.branchA, key)).statusCode).toBe(200);
+  await fixture.connection.db
+    .update(managerAssignments)
+    .set({ status: 'suspended' })
+    .where(eq(managerAssignments.id, value.assignmentId));
+  expect((await request(manager.accessToken, value.branchA, key)).statusCode).toBe(403);
+  expect(await auditRows(value.branchA)).toHaveLength(1);
+  await fixture.service.logout(value.managerId, manager.sessionId);
+  expect((await request(manager.accessToken, value.branchA, key)).statusCode).toBe(401);
+});
