@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  body {
+    @apply bg-hsm-background font-sans text-body text-hsm-text antialiased;
+  }
+  ::selection {
+    @apply bg-hsm-aqua text-hsm-heading;
+  }
+  a,
+  button,
+  input {
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-hsm-primary;
+  }
+}
+@layer components {
+  .field-label {
+    @apply mb-2 block text-sm font-semibold text-hsm-heading;
+  }
+  .field-input {
+    @apply min-h-12 w-full rounded-input border border-hsm-border bg-hsm-surface px-4 py-3 text-base text-hsm-text;
+  }
+  .field-error {
+    @apply mt-2 text-sm text-hsm-dangerText;
+  }
+  .text-link {
+    @apply font-semibold text-hsm-primary underline-offset-4 hover:underline;
+  }
+  .customer-backdrop {
+    @apply bg-customer-background bg-customer-glow text-customer-text;
+  }
+  .customer-frost {
+    @apply rounded-panel border border-customer-cardBorder bg-customer-cardSurface bg-customer-frost shadow-customer-frost;
+  }
+  .customer-skeleton {
+    @apply rounded-panel bg-customer-aqua motion-safe:animate-pulse;
+  }
+}
