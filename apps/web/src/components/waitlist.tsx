@@ -51,3 +51,57 @@ function Workspace({ actorId, branchId, accessUnavailable = false }: Props) {
         accessUnavailable || query.isError ? (
           <>
             <p role="alert">
+              {accessUnavailable
+                ? 'Refresh branch access before continuing.'
+                : errorMessage(query.error)}
+            </p>
+            <Button onClick={() => void query.refetch()}>Refresh waiting list</Button>
+          </>
+        ) : query.isPending || query.isFetching ? (
+          <p role="status">Loading current waiting list…</p>
+        ) : (
+          <>
+            {!query.data?.data.length ? <p>No waiting-list entries on this page.</p> : null}
+            {query.data?.data.map((row) => (
+              <article key={row.id} className="space-y-2 rounded-card border border-hsm-border p-4">
+                <h3>
+                  {row.branchName} — {row.roomTypeName ?? 'Any room type'}
+                </h3>
+                {'customerName' in row ? <p>{String(row.customerName)}</p> : null}
+                <p>{row.leftAt ? 'Left waiting list' : 'Waiting for availability'}</p>
+                {row.expectedVacancyDate ? (
+                  <p>
+                    A resident plans to leave on {row.expectedVacancyDate}. This is not guaranteed
+                    availability.
+                  </p>
+                ) : null}
+                {!branchId && row.leftAt === null ? (
+                  <Button
+                    disabled={locked}
+                    onClick={() => mutation.mutate({ kind: 'leave', entryId: row.id })}
+                  >
+                    Leave waiting list
+                  </Button>
+                ) : null}
+              </article>
+            ))}
+            <Button
+              variant="secondary"
+              disabled={locked || !cursor}
+              onClick={() => setCursor(undefined)}
+            >
+              First waiting-list page
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={locked || !query.data?.nextCursor}
+              onClick={() => setCursor(query.data?.nextCursor ?? undefined)}
+            >
+              Next waiting-list page
+            </Button>
+          </>
+        )
+      ) : null}
+    </section>
+  );
+}
