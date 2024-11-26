@@ -1,0 +1,15 @@
+appId: pk.hsm.app
+---
+- tapOn: { id: field-code }
+- inputText: { text: '${OTP}', label: Enter same-account verification code }
+- hideKeyboard
+- tapOn: Verify email
+- extendedWaitUntil: { visible: Complete Customer profile, timeout: 20000 }
+- assertNotVisible: { id: field-code }
+- scrollUntilVisible: { element: { text: Complete Owner profile } }
+- assertVisible: Complete Owner profile
+- scrollUntilVisible: { element: { text: Manager space } }
+- assertVisible: Manager space
+- scrollUntilVisible: { element: { text: Branch A } }
+- assertVisible: Branch A
+- assertNotVisible: Branch B

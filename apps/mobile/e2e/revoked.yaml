@@ -1,0 +1,9 @@
+appId: pk.hsm.app
+---
+- launchApp
+- extendedWaitUntil: { visible: Sign In, timeout: 20000 }
+- assertVisible: Your session has ended. Please sign in again.
+- assertNotVisible: Manager space
+- launchApp
+- extendedWaitUntil: { visible: Sign In, timeout: 20000 }
+- assertNotVisible: Manager space

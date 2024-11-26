@@ -1,0 +1,36 @@
+appId: pk.hsm.app
+---
+- assertVisible: Verify your email
+- tapOn: { id: field-code }
+- inputText: { text: '${OTP}', label: Enter verification code }
+- hideKeyboard
+- tapOn: Verify email
+- extendedWaitUntil: { visible: Set your password, timeout: 20000 }
+- tapOn: { id: field-password }
+- inputText: { text: '${PASSWORD}', label: Enter permanent test password }
+- hideKeyboard
+- tapOn: { id: field-confirmPassword }
+- inputText: { text: '${PASSWORD}', label: Confirm permanent test password }
+- hideKeyboard
+- tapOn: Set password
+- extendedWaitUntil: { visible: Choose your space, timeout: 20000 }
+- tapOn: Complete Customer profile
+- assertVisible: Complete your Customer profile
+- assertNotVisible: { id: field-cnic }
+- assertNotVisible: { id: field-dateOfBirth }
+- tapOn: { id: field-fullName }
+- inputText: { text: Mobile Identity, label: Enter test display name }
+- hideKeyboard
+- tapOn: { id: field-phone }
+- inputText: { text: '${PHONE}', label: Enter test contact mobile }
+- hideKeyboard
+- tapOn: { id: field-age }
+- inputText: { text: '26', label: Enter adult age }
+- hideKeyboard
+- scrollUntilVisible: { element: { text: '^male$' } }
+- tapOn: { text: '^male$' }
+- scrollUntilVisible: { element: { text: Save Customer profile } }
+- tapOn: Save Customer profile
+- extendedWaitUntil: { visible: 'Hello, Mobile Identity', timeout: 20000 }
+- scrollUntilVisible: { element: { text: Customer space } }
+- assertVisible: Customer space
