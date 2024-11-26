@@ -111,3 +111,116 @@ function serve(payroll: boolean) {
   vi.mocked(listStaff).mockResolvedValue({ data: [member(payroll)], nextCursor: null, payroll });
   vi.mocked(readStaff).mockResolvedValue(detail(payroll));
 }
+function show(canSetUp: boolean) {
+  render(
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
+      <StaffWorkspace actorId="actor" branchId={branchId} canSetUp={canSetUp} />
+    </QueryClientProvider>,
+  );
+}
+beforeEach(() => vi.clearAllMocks());
+afterEach(cleanup);
+it('CHG-039: without payroll access a manager sees staff but no money and cannot add staff', async () => {
+  serve(false);
+  show(false);
+  expect(await screen.findByText('Asad Khan')).toBeTruthy();
+  expect(screen.queryByText('Left to pay')).toBeNull();
+  expect(screen.queryByText(/PKR/)).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Add staff' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Open Asad Khan' }));
+  expect(await screen.findByText(/Cook · since 2026-01-10 · 03001234567/)).toBeTruthy();
+  expect(screen.queryByRole('region', { name: 'Salary' })).toBeNull();
+});
+it('CHG-039: with payroll access the dashboard shows money and overdue partial salary', async () => {
+  serve(true);
+  show(false);
+  expect(await screen.findByText('Left to pay')).toBeTruthy();
+  expect(await screen.findAllByText('Overdue')).toHaveLength(2);
+  expect(screen.getByText('Partly paid')).toBeTruthy();
+});
+it('CHG-039: the owner adds staff with first salary terms in integer paisa', async () => {
+  serve(true);
+  vi.mocked(createStaff).mockResolvedValue(member(true));
+  show(true);
+  fireEvent.click(await screen.findByRole('button', { name: 'Add staff' }));
+  fireEvent.change(screen.getByLabelText('Full name'), { target: { value: ' Bilal ' } });
+  fireEvent.change(screen.getByLabelText('Job'), { target: { value: 'security_guard' } });
+  fireEvent.change(screen.getByLabelText('Start date'), { target: { value: '2026-11-15' } });
+  await waitFor(() => expect(screen.getByLabelText('Monthly salary, PKR (optional)')).toBeTruthy());
+  fireEvent.change(screen.getByLabelText('Monthly salary, PKR (optional)'), {
+    target: { value: '30,000' },
+  });
+  fireEvent.change(screen.getByLabelText('Pay day'), { target: { value: '29' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+  expect(await screen.findByText('Salary day must be 1 to 28.')).toBeTruthy();
+  expect(createStaff).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText('Pay day'), { target: { value: '5' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(createStaff).toHaveBeenCalledTimes(1));
+  expect(vi.mocked(createStaff).mock.calls[0]?.[2]).toEqual({
+    fullName: 'Bilal',
+    jobTitle: 'security_guard',
+    startsOn: '2026-11-15',
+    salary: { amountPaisa: 3_000_000, dueDay: 5, effectiveFrom: '2026-11-01' },
+  });
+});
+it('CHG-039: a salary payment cannot exceed what is owed and is sent once with one key', async () => {
+  serve(true);
+  vi.mocked(recordStaffPayment).mockResolvedValue({} as never);
+  show(false);
+  fireEvent.click(await screen.findByRole('button', { name: 'Open Asad Khan' }));
+  fireEvent.click(await screen.findByRole('button', { name: /Record payment/ }));
+  const amount = screen.getByLabelText<HTMLInputElement>('Amount paid, PKR');
+  expect(amount.value).toBe('20,000');
+  fireEvent.change(amount, { target: { value: '25000' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Confirm payment' }));
+  expect(await screen.findByText(/more than the .*20,000 still owed/)).toBeTruthy();
+  expect(recordStaffPayment).not.toHaveBeenCalled();
+  fireEvent.change(amount, { target: { value: '15000' } });
+  fireEvent.change(screen.getByLabelText('Method'), { target: { value: 'bank_transfer' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Confirm payment' }));
+  await waitFor(() => expect(recordStaffPayment).toHaveBeenCalledTimes(1));
+  const [, sentBranch, sentSalary, body, key] = vi.mocked(recordStaffPayment).mock.calls[0] ?? [];
+  expect([sentBranch, sentSalary]).toEqual([branchId, salaryId]);
+  expect(body).toMatchObject({ amountPaisa: 1_500_000, method: 'bank_transfer' });
+  expect(typeof key).toBe('string');
+});
+it('CHG-039: a recorded payment is corrected by a reversal with a reason, never deleted', async () => {
+  serve(true);
+  vi.mocked(reverseStaffPayment).mockResolvedValue({} as never);
+  show(false);
+  fireEvent.click(await screen.findByRole('button', { name: 'Open Asad Khan' }));
+  fireEvent.click(await screen.findByRole('button', { name: /Correct payment/ }));
+  fireEvent.change(screen.getByLabelText('Why reverse it?'), { target: { value: 'Wrong amount' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Reverse payment' }));
+  await waitFor(() => expect(reverseStaffPayment).toHaveBeenCalledTimes(1));
+  expect(vi.mocked(reverseStaffPayment).mock.calls[0]?.slice(1, 4)).toEqual([
+    branchId,
+    paymentId,
+    { reason: 'Wrong amount' },
+  ]);
+});
+it('CHG-039: editing clears a removed phone and custom title explicitly', () => {
+  const body = staffBody(
+    {
+      fullName: 'Asad',
+      phone: ' ',
+      jobTitle: 'cook',
+      customTitle: 'x',
+      startsOn: '2026-01-10',
+      salary: '',
+      dueDay: '1',
+    },
+    member(false),
+  );
+  expect(body).toEqual({
+    fullName: 'Asad',
+    jobTitle: 'cook',
+    startsOn: '2026-01-10',
+    expectedVersion: 3,
+    phone: null,
+    customTitle: null,
+  });
+});
