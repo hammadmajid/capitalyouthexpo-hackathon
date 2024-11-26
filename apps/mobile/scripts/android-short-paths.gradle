@@ -1,0 +1,24 @@
+// ONB-001 / CHG-006: keep generated CMake paths short on Windows with pnpm.
+// Compilation inputs, ABI selection and verification tasks are unchanged.
+if (System.getProperty("os.name").startsWith("Windows")) {
+  gradle.beforeProject { project ->
+    ["com.android.application", "com.android.library"].each { pluginId ->
+      project.plugins.withId(pluginId) {
+        def androidRoot = project.rootProject.projectDir.canonicalFile
+        if (androidRoot.name != "android" || androidRoot.parentFile.name != "mobile" ||
+          androidRoot.parentFile.parentFile.name != "apps") {
+          throw new GradleException("Unexpected HSM Android project location")
+        }
+        def repository = androidRoot.parentFile.parentFile.parentFile
+        def nativeRoot = new File(repository, ".tools/android-cxx").canonicalFile
+        def module = project.path.substring(1).replace(":", "_")
+        def staging = new File(nativeRoot, module).canonicalFile
+        if (!module || staging.parentFile != nativeRoot) {
+          throw new GradleException("Invalid native build staging directory")
+        }
+        project.extensions.getByName("android").externalNativeBuild.cmake
+          .buildStagingDirectory = staging
+      }
+    }
+  }
+}
