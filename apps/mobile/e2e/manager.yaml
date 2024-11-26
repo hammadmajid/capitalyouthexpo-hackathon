@@ -1,0 +1,22 @@
+appId: pk.hsm.app
+---
+- launchApp
+- scrollUntilVisible: { element: { text: Activate manager account } }
+- tapOn: Activate manager account
+- tapOn: { id: field-phone }
+- inputText: { text: '${PHONE}', label: Enter invited test mobile }
+- hideKeyboard
+- tapOn: { id: field-tempPassword }
+- inputText: { text: '${TEMP_PASSWORD}', label: Enter temporary test password }
+- hideKeyboard
+- tapOn: { id: field-newPassword }
+- inputText: { text: '${PASSWORD}', label: Enter new test password }
+- hideKeyboard
+- tapOn: Activate account
+- extendedWaitUntil: { visible: Choose your space, timeout: 20000 }
+- scrollUntilVisible: { element: { text: Manager space } }
+- extendedWaitUntil: { visible: Manager space, timeout: 20000 }
+- scrollUntilVisible: { element: { text: Branch A } }
+- assertNotVisible: Branch B
+- tapOn: Branch A
+- assertVisible: 'Selected: Branch A'

@@ -1,0 +1,7 @@
+appId: pk.hsm.app
+---
+- scrollUntilVisible: { element: { text: Account security } }
+- tapOn: Account security
+- scrollUntilVisible: { element: { text: Sign out all devices } }
+- tapOn: Sign out all devices
+- extendedWaitUntil: { visible: Sign In, timeout: 20000 }

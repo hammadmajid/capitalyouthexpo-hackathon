@@ -1,0 +1,5 @@
+appId: pk.hsm.app
+---
+- scrollUntilVisible: { element: { text: Sign out } }
+- tapOn: Sign out
+- extendedWaitUntil: { visible: Sign In, timeout: 20000 }
