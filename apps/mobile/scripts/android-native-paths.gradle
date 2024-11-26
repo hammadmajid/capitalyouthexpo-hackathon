@@ -1,0 +1,12 @@
+if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+  def nativeStagingRoot = new File(rootDir, '../../../.tools/android/cxx').canonicalFile
+  subprojects { nativeProject ->
+    ['com.android.application', 'com.android.library'].each { androidPlugin ->
+      nativeProject.pluginManager.withPlugin(androidPlugin) {
+        def androidExtension = nativeProject.extensions.getByName('android')
+        androidExtension.externalNativeBuild.cmake.buildStagingDirectory =
+          new File(nativeStagingRoot, nativeProject.name).canonicalFile
+      }
+    }
+  }
+}
