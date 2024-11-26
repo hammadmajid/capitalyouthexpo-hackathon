@@ -1,0 +1,10 @@
+appId: pk.hsm.app
+---
+- tapOn: { id: field-email }
+- inputText: { text: '${EMAIL}', label: Enter test identity }
+- hideKeyboard
+- tapOn: { id: field-password }
+- inputText: { text: '${PASSWORD}', label: Enter test password }
+- hideKeyboard
+- tapOn: Sign In
+- extendedWaitUntil: { visible: 'Hello, Mobile Identity', timeout: 20000 }

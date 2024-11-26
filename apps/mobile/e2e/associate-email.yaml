@@ -1,0 +1,18 @@
+appId: pk.hsm.app
+---
+- launchApp
+- extendedWaitUntil: { visible: Choose your space, timeout: 20000 }
+- assertNotVisible: Complete Customer profile
+- assertNotVisible: Complete Owner profile
+- scrollUntilVisible: { element: { id: field-email } }
+- tapOn: { id: field-email }
+- inputText: { text: '${EMAIL}', label: Enter same-account test email }
+- hideKeyboard
+- scrollUntilVisible: { element: { id: field-currentPassword } }
+- tapOn: { id: field-currentPassword }
+- inputText: { text: '${PASSWORD}', label: Enter current test password }
+- hideKeyboard
+- scrollUntilVisible: { element: { text: Send verification code } }
+- tapOn: Send verification code
+- extendedWaitUntil: { visible: Email verification code, timeout: 20000 }
+- assertNotVisible: { id: field-currentPassword }

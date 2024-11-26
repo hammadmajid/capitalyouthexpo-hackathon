@@ -1,0 +1,5 @@
+appId: pk.hsm.app
+---
+- launchApp
+- extendedWaitUntil: { visible: Sign In, timeout: 20000 }
+- assertNotVisible: Customer space
