@@ -1,0 +1,17 @@
+appId: pk.hsm.app
+---
+- launchApp: { stopApp: true }
+- extendedWaitUntil: { visible: 'Hello, Native Owner', timeout: 20000 }
+- scrollUntilVisible: { element: { text: Set up your hostel } }
+- tapOn: Set up your hostel
+- extendedWaitUntil: { visible: Native organization, timeout: 20000 }
+- tapOn: Native organization
+- scrollUntilVisible: { element: { text: Native private hostel } }
+- tapOn: Native private hostel
+- scrollUntilVisible: { element: { id: field-address } }
+- assertVisible: Private native branch address
+- scrollUntilVisible: { element: { text: Submit for verification } }
+- tapOn: Submit for verification
+- scrollUntilVisible: { element: { text: 'Status: submitted' } }
+- assertVisible: 'Status: submitted'
+- assertNotVisible: { id: field-address }

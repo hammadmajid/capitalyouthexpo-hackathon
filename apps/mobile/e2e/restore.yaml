@@ -1,0 +1,6 @@
+appId: pk.hsm.app
+---
+- launchApp
+- extendedWaitUntil: { visible: 'Hello, Mobile Identity', timeout: 20000 }
+- scrollUntilVisible: { element: { text: Customer space } }
+- assertVisible: Customer space

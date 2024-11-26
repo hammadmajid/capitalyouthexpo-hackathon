@@ -1,0 +1,41 @@
+appId: pk.hsm.app
+---
+- tapOn: { id: field-email }
+- inputText: { text: '${EMAIL}', label: Enter isolated Owner fixture identity }
+- hideKeyboard
+- tapOn: { id: field-password }
+- inputText: { text: '${PASSWORD}', label: Enter isolated Owner fixture password }
+- hideKeyboard
+- tapOn: Sign In
+- extendedWaitUntil: { visible: 'Hello, Native Owner', timeout: 20000 }
+- scrollUntilVisible: { element: { text: Set up your hostel } }
+- tapOn: Set up your hostel
+- extendedWaitUntil: { visible: Native organization, timeout: 20000 }
+- tapOn: Native organization
+- scrollUntilVisible: { element: { id: field-hostelName } }
+- tapOn: { id: field-hostelName }
+- inputText: Native private hostel
+- hideKeyboard
+- tapOn: boys
+- scrollUntilVisible: { element: { text: Create private hostel } }
+- tapOn: Create private hostel
+- extendedWaitUntil: { visible: Native private hostel, timeout: 20000 }
+- scrollUntilVisible: { element: { text: Native city } }
+- tapOn: Native city
+- scrollUntilVisible: { element: { text: Native area } }
+- tapOn: Native area
+- scrollUntilVisible: { element: { id: field-address } }
+- tapOn: { id: field-address }
+- inputText: Private native branch address
+- hideKeyboard
+- scrollUntilVisible: { element: { text: Choose on map } }
+- tapOn: Choose on map
+- scrollUntilVisible: { element: { id: branch-location-map } }
+- extendedWaitUntil: { visible: { id: branch-location-map }, timeout: 20000 }
+- extendedWaitUntil: { visible: 'Map ready.', timeout: 20000 }
+- tapOn: { id: branch-location-map }
+- scrollUntilVisible: { element: { text: Use selected pin } }
+- tapOn: Use selected pin
+- scrollUntilVisible: { element: { text: Save main branch } }
+- tapOn: Save main branch
+- extendedWaitUntil: { visible: Main branch saved., timeout: 20000 }

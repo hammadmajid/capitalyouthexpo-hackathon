@@ -1,0 +1,16 @@
+appId: pk.hsm.app
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil: { visible: Welcome Back, timeout: 20000 }
+- scrollUntilVisible: { element: { text: Sign up } }
+- tapOn: Sign up
+- assertVisible: Create your account
+- assertNotVisible: { id: field-password }
+- assertNotVisible: { id: field-cnic }
+- assertNotVisible: { id: field-dateOfBirth }
+- tapOn: { id: field-email }
+- inputText: { text: '${EMAIL}', label: Enter test email }
+- hideKeyboard
+- tapOn: Send email code
+- extendedWaitUntil: { visible: Verify your email, timeout: 20000 }
