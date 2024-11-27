@@ -62,3 +62,67 @@ export function usePublicInventoryPages(branchId: string, range?: StayRange) {
     setRoomChoice(id);
     setBedPosition(undefined);
   }
+  function firstTypes() {
+    setTypeCursor(undefined);
+    chooseType();
+  }
+  function nextTypes() {
+    if (types.data?.nextCursor) {
+      setTypeCursor(types.data.nextCursor);
+      chooseType();
+    }
+  }
+  function firstRooms() {
+    setRoomPosition(undefined);
+    chooseRoom();
+  }
+  function nextRooms() {
+    if (type && rooms.data?.nextCursor) {
+      setRoomPosition({ parentId: type.id, cursor: rooms.data.nextCursor });
+      chooseRoom();
+    }
+  }
+  function firstBeds() {
+    setBedPosition(undefined);
+  }
+  function nextBeds() {
+    if (room && beds.data?.nextCursor)
+      setBedPosition({ parentId: room.id, cursor: beds.data.nextCursor });
+  }
+  async function retry() {
+    const current = await types.refetch();
+    if (current.isError) return;
+    if (!type || !current.data?.data.some((row) => row.id === type.id)) {
+      chooseType();
+      return;
+    }
+    const physical = await rooms.refetch();
+    if (physical.isError) return;
+    if (!room || !physical.data?.data.some((row) => row.id === room.id)) {
+      chooseRoom();
+      return;
+    }
+    if (bedEnabled) await beds.refetch();
+  }
+  return {
+    types,
+    rooms,
+    beds,
+    type,
+    room,
+    bedEnabled,
+    error,
+    typeCursor,
+    roomCursor,
+    bedCursor,
+    chooseType,
+    chooseRoom,
+    firstTypes,
+    nextTypes,
+    firstRooms,
+    nextRooms,
+    firstBeds,
+    nextBeds,
+    retry,
+  };
+}
