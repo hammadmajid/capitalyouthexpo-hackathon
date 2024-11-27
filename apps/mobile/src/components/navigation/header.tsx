@@ -87,3 +87,92 @@ export function AppHeader({
             onSubmitEditing={search.onSubmit}
             autoCapitalize="none"
             autoFocus={!search.alwaysVisible}
+            style={s.input}
+          />
+          <Pressable
+            accessibilityRole="button"
+            disabled={search.disabled}
+            accessibilityState={{ disabled: Boolean(search.disabled) }}
+            accessibilityLabel={search.submitLabel}
+            onPress={search.onSubmit}
+            style={s.icon}
+            android_ripple={{ color: colors.aqua }}
+          >
+            <ArrowRight size={icons.size} color={colors.primary} />
+          </Pressable>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+function InlineBackHandler({ onBack, disabled }: { onBack: () => void; disabled: boolean }) {
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (!disabled) onBack();
+        return true;
+      });
+      return () => subscription.remove();
+    }, [onBack, disabled]),
+  );
+  return null;
+}
+export function NavIconButton({
+  label = 'Back',
+  onPress,
+  disabled = false,
+  children,
+}: {
+  label?: string;
+  onPress: () => void;
+  disabled?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      android_ripple={{ color: colors.aqua }}
+      style={s.icon}
+    >
+      {children ?? <ArrowLeft color={disabled ? colors.muted : colors.primary} size={icons.size} />}
+    </Pressable>
+  );
+}
+const s = StyleSheet.create({
+  container: { gap: spacing.md },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  title: { flex: 1, flexShrink: 1 },
+  icon: {
+    ...mobileSurfaces.icyCard,
+    width: spacing.touch,
+    height: spacing.touch,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: mobileSurfaces.icyCard.backgroundColor,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: mobileSurfaces.icyCard.borderColor,
+    overflow: 'hidden',
+  },
+  search: {
+    ...mobileSurfaces.icyCard,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: mobileSurfaces.icyCard.backgroundColor,
+    borderRadius: radii.input,
+    borderWidth: 1,
+    borderColor: mobileSurfaces.icyCard.borderColor,
+    padding: spacing.xs,
+  },
+  input: {
+    flex: 1,
+    minHeight: spacing.touch,
+    paddingHorizontal: spacing.md,
+    color: colors.text,
+    fontSize: 16,
+  },
+});
