@@ -340,8 +340,7 @@ marketplaceColors.heroScrim derives from the existing dark green for the overlay
 management and login colors are unchanged. Caption the static scene Illustrative
 image; it does not represent a real verified listing. On image failure retain the
 live content over the branded background and state Illustration unavailable.
-Actual listing cards/gallery still use approved clean Owner media only. See
-assets/marketplace-hero-provenance.md for exact prompt and source history. Web
+Actual listing cards/gallery still use approved clean Owner media only. Web
 integration/tests are authored, mobile integration and visual acceptance pending.
 
 The photographic draft above is superseded by clearly drawn neutral editorial

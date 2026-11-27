@@ -1,48 +1,79 @@
-# Twin Cities Hostel Marketplace & Management System
+# PakHostels
 
-A verified hostel marketplace (mobile app) connected to branch-scoped hostel operations (web app), for Islamabad and Rawalpindi.
+Twin Cities Hostel Marketplace & Management System.
 
-**Repository:** https://github.com/ammad981/hsm (private)
+Verified hostels, real available seats and real prices for students and young professionals in
+Islamabad and Rawalpindi, connected directly to the tools hostel owners use to run their
+branches.
 
-**Status:** Phase 1: Foundations, development started. See [`docs/STATUS.md`](docs/STATUS.md) and the Phase 1 task list in [`docs/05-roadmap.md`](docs/05-roadmap.md).
+## The problem
 
-| Start here                     |                                                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| New developer / AI agent       | [`AGENTS.md`](AGENTS.md)                                                                                                       |
-| Current status & next steps    | [`docs/STATUS.md`](docs/STATUS.md)                                                                                             |
-| Product summary                | [`docs/00-project-overview.md`](docs/00-project-overview.md)                                                                   |
-| Architecture & stack           | [`docs/02-architecture.md`](docs/02-architecture.md)                                                                           |
-| Requirements (source of truth) | `Twin_Cities_Hostel_Marketplace_Management_SRS_v2.0_50_pages.pdf` / [`docs/srs/SRS-v2.0-text.txt`](docs/srs/SRS-v2.0-text.txt) |
+Finding a hostel in the twin cities means scrolling Facebook groups, calling numbers that
+don't pick up, and visiting places whose photos, prices and "available seats" turn out to be
+wrong. Hostel owners, meanwhile, track beds, rent and complaints in registers and WhatsApp.
 
-## Planned stack
+## What we built
 
-Expo React Native (customer app) · Next.js (management web) · NestJS API · PostgreSQL + PostGIS · Drizzle ORM · Redis/BullMQ · Docker Compose on VPS
+| Pillar                  | Platform                       | What it does                                                                                                        |
+| ----------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Customer marketplace    | Mobile app (Expo React Native) | Search verified hostels by area and nearby university, see seat-level availability and price, book, then live there |
+| Resident portal         | Mobile app                     | Pay rent with proof upload, get receipts, raise complaints, see the menu and transport, check out                   |
+| Hostel management       | Web app (Next.js)              | Owners and Branch Managers run beds, bookings, residents, rent, staff and transport across branches                 |
+| Platform administration | Web app                        | Hostel verification, moderation, support and audit                                                                  |
 
-## Phase 1 implementation
+**Core principle:** marketplace availability comes from real branch operations (the Bed Board),
+never from a separately edited marketing number.
 
-Source foundations are being implemented. See [the implementation checkpoint](docs/phase-1-implementation.md)
-and [STATUS](docs/STATUS.md) for verified work and remaining gates. Application directories
-are currently placeholders, not runnable applications. Eventual mobile/web capability parity
-uses the same API, authorization and database, per the user's implementation brief.
+## Architecture
 
-Use Node 24 LTS, Corepack and the pinned pnpm version:
+```
+apps/
+  mobile   Expo React Native customer + resident app
+  web      Next.js management and admin web app
+  api      NestJS REST API (one API for both apps)
+  worker   BullMQ background jobs (billing, notifications, file scanning)
+packages/
+  db         Drizzle ORM schema + migrations (PostgreSQL 17 + PostGIS)
+  contracts  Shared Zod schemas, money and date helpers
+  api-client Generated typed API client
+  ui, security, files, notifications, emails, observability, config, test-support
+```
+
+Stack: TypeScript everywhere · pnpm + Turborepo · PostgreSQL/PostGIS · Redis/BullMQ ·
+S3-compatible storage · Docker Compose.
+
+## Engineering highlights
+
+- **Branch-scoped authorisation:** every management request resolves the branch server-side; a
+  manager can never reach another branch through the UI, URL or API.
+- **No double booking:** seat changes run in row-locked transactions with concurrency tests.
+- **Money is exact:** integer paisa (`bigint`) end to end, never floating point.
+- **Audited:** every privileged action writes an audit log in the same transaction.
+- **Private by default:** CNIC, documents and payment proofs are masked, served through
+  short-lived signed URLs and access-logged.
+- 1,000+ test files (unit, integration on real Postgres via Testcontainers, API, authorisation
+  matrix, concurrency, Playwright and Maestro E2E).
+
+## Run it locally
+
+Requires Node 24, Corepack and Docker (Compose v2).
 
 ```sh
 corepack enable
 pnpm install --frozen-lockfile
-pnpm turbo run lint typecheck test build
+cp .env.example .env            # then fill in local values
+docker compose --env-file .env -f infra/docker-compose.yml up -d
+pnpm turbo run db:migrate db:seed
+pnpm dev
 ```
 
-In a compatible container environment (GitHub Actions Ubuntu or a developer machine):
+Checks: `pnpm turbo run lint typecheck test build` and `pnpm turbo run test:integration`.
+See [infra/README.md](infra/README.md) for the local services.
 
-```sh
-pnpm turbo run test:integration
-```
+## Documentation
 
-Local infrastructure setup is documented in [infra/README.md](infra/README.md).
-Real database tests retain Testcontainers and run authoritatively in GitHub Actions Ubuntu.
-Windows source/unit work does not require a container runtime. See
-[CI verification](docs/ci-verification.md) for commands and LOCAL PASS / CI PASS /
-NOT RUN LOCALLY evidence. Git hooks also require gitleaks on PATH and a real Git
-checkout. This supplied folder has no Git metadata; attach it to the existing repository
-before committing or opening PRs. No new repository history is created automatically.
+- [Product overview](docs/00-project-overview.md) · [Roles & permissions](docs/01-roles-and-permissions.md)
+- [Architecture](docs/02-architecture.md) · [Domain model](docs/03-domain-model.md)
+- [Database schema](docs/06-database-schema.md) · [API contract](docs/07-api-contract.md)
+- [Screens](docs/08-screens.md) · [Design system](docs/09-design-system.md)
+- [Architecture decision records](docs/adr/) · [Requirements (SRS)](docs/srs/)

@@ -1,4 +1,4 @@
-// Q12 (docs/04-open-questions.md): the public brand name is still open. Public
+// The public brand name is not final. Public
 // chrome reads it from here so the eventual rename is a one-line change.
 export const brand = {
   name: 'HSM',

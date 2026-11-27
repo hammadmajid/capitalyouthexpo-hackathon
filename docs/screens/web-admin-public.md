@@ -105,7 +105,6 @@ Failed refreshed details hide cached verified content, gallery and quote control
 The Home hero consumes the clearly drawn local neutral illustration, labeled
 Illustrative image. Headline/guidance remain live accessible text and image errors
 preserve a branded fallback. Real listing cards/gallery never use this artwork.
-Exact asset prompts/provenance are in ../assets/marketplace-hero-provenance.md.
 Current UI component/static/visual acceptance remains pending.
 
 ### Public hostel rules (TRUST-006 / ACC-002)
