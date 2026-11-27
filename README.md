@@ -1,4 +1,6 @@
-# Twin Cities Hostel Marketplace & Management System
+# PakHostels
+
+Twin Cities Hostel Marketplace & Management System.
 
 Verified hostels, real available seats and real prices for students and young professionals in
 Islamabad and Rawalpindi, connected directly to the tools hostel owners use to run their
