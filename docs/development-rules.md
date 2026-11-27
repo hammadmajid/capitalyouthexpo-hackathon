@@ -5,14 +5,6 @@ If a rule must be broken, record why in the PR and get explicit approval. A perm
 
 ---
 
-## Current execution scope (2026-10-28)
-
-AUD-001–015 remediation precedes the coordinated Phase11 acceptance campaign.
-Use focused verification while implementing, then freeze source and run the
-mandatory full gates sequentially. Historical milestone evidence is retained;
-it does not certify changed source. See [roadmap](05-roadmap.md) and
-[audit inventory](audit-remaining-work-20261028.md). No Phase12 or deployment.
-
 ## 1. Tooling
 
 | Rule                           | Detail                                                                                                                                                                                                            |
@@ -23,7 +15,7 @@ it does not certify changed source. See [roadmap](05-roadmap.md) and
 | Node                           | Active LTS, pinned in `.nvmrc` and `engines`                                                                                                                                                                      |
 | TypeScript                     | `strict: true`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `exactOptionalPropertyTypes`. Shared configs in `packages/config`                                                                               |
 | Lint / format                  | ESLint (typescript-eslint strict + security plugins) + Prettier. Lint errors fail CI                                                                                                                              |
-| Git hooks                      | Husky + lint-staged: format + lint on staged files; commitlint on messages                                                                                                                                        |
+| Git hooks                      | Husky + lint-staged: format + lint on staged files                                                                                                                                                                |
 | Dependencies                   | Add with `pnpm add --filter <pkg>`. Shared versions go through the pnpm `catalog:`. Check licence and maintenance before adding a new dependency                                                                  |
 
 ---
@@ -66,7 +58,6 @@ it does not certify changed source. See [roadmap](05-roadmap.md) and
 
 - **Every change, however small, is committed and pushed to GitHub immediately.** This applies to developers, Claude, Codex and any other agent. Uncommitted or unpushed work is not allowed to sit locally. End every work session with `git status` clean and the branch pushed.
 - One logical change per commit (small, atomic). Don't batch unrelated changes.
-- **Conventional Commits** with the SRS ID where relevant: `feat(bookings): enforce max 3 active requests (BKG-001)`, `docs(schema): add credit_ledger`.
 - Branches:
   - **Phase 0 (planning, docs only):** docs commits may go straight to `main`.
   - **From Phase 1 (code), which is now active:** work on `feat/<ticket>-short-name`, `fix/…`, `chore/…`, `docs/…`. Push the branch after every commit and keep a PR open into `main`.
@@ -194,7 +185,7 @@ unit/contracts tests, coverage, build, migration drift, audit) from `container-i
 Both local container-capable environments and CI run `pnpm turbo run test:integration`.
 Security scanning jobs remain required. New API/database, authorization and transactional
 suites must be attached to that integration task as implemented; absent suites cannot
-satisfy Phase 1 exit gates. See `docs/ci-verification.md` for current coverage and gaps.
+satisfy Phase 1 exit gates.
 
 ---
 
@@ -208,5 +199,4 @@ satisfy Phase 1 exit gates. See `docs/ci-verification.md` for current coverage a
 - [ ] No file over 500 lines; lint and typecheck clean
 - [ ] DB changes: migration generated + `docs/06-database-schema.md` updated
 - [ ] API changes: OpenAPI updated, client regenerated
-- [ ] `docs/STATUS.md` updated
-- [ ] **Committed (Conventional Commit) and pushed to GitHub**; working tree clean
+- [ ] **Committed and pushed to GitHub**; working tree clean
